@@ -1,0 +1,12 @@
+.content {
+  padding: 10px;
+}
+
+.sticky{
+  position: sticky;
+  top: 50px;
+}
+
+p:not(:last-child) {
+  margin-block-end: 10px;
+}

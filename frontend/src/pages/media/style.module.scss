@@ -1,0 +1,23 @@
+.page {
+  margin: 50px auto;
+  max-inline-size: 1440px;
+}
+
+.header {
+  text-align: center;
+  margin-block-end: 50px;
+}
+
+.media {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+
+.item {
+  flex-grow: 1;
+  flex-basis: 200px;
+  height: 150px;
+}

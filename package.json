@@ -1,0 +1,13 @@
+{
+  "name": "news",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "front:dev": "cd frontend && npm run dev",
+    "back:dev": "cd backend && npm run start:dev",
+    "back:start": "cd backend && npm run start"     
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

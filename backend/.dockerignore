@@ -1,0 +1,20 @@
+# Deps
+node_modules/
+package-lock.json
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# README и файлы лицензий
+README.md
+LICENSE
+
+# Dist
+dist/
+build/
+
+# IDE Files
+.idea/
+.vscode
+.DS_Store 

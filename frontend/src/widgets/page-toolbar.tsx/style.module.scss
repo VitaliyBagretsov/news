@@ -1,0 +1,14 @@
+.toolbar {
+  width: 100%;
+  padding: 10px 10px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  max-block-size: 200px;
+}
+
+.logo {
+  display: block;
+  height: 50px;
+  aspect-ratio: 1/1;
+}

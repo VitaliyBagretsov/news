@@ -1,0 +1,28 @@
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  border: 1px solid #c0c0c0;
+  padding: 5px;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.header {
+  text-align: left;
+}
+
+.date {
+  align-self: end;
+  font-size: 0.8em;
+}
+
+.item:hover {
+  background-color: #646cff;
+}
+
+.item:hover .header,
+.item:hover .date {
+  // color: rgb(54, 6, 185);
+  color: #c0c0c0;
+}
