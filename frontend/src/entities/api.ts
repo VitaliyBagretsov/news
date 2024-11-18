@@ -12,7 +12,7 @@ const parceQuery = (query: IQuery<INews>): string => {
   return result.join('&');
 };
 
-const baseUrl = 'http://localhost:4005/';
+const baseUrl = `${import.meta.env.VITE_API}`
 
 // Define a service using a base URL and expected endpoints
 export const newsApi = createApi({
