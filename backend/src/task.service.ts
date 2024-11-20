@@ -1,6 +1,7 @@
 import { AppService } from '@app.service';
+import { CommonService } from '@common/common.service';
 import { parserConfig } from '@constants/parser.constant';
-import { Media } from '@entities/media.entity';
+import { Media } from '@media/entities/media.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 
@@ -9,11 +10,14 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
   private timerMitutes: number = 5;
 
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly commonService: CommonService,
+  ) {}
 
   @Cron(`0 */5 * * * *`)
   async cronWriteNews() {
-    const list = await this.appService.getEntity<Media>('media', {
+    const list = await this.commonService.getData<Media>('media', {
       filter: { isActive: true },
     });
 

@@ -1,30 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
-import {
-  filterNews,
-  getActualListNewsLinks,
-  getDocuments,
-  getNewsContent,
-} from './util/dom.util';
-import { InjectDataSource, InjectEntityManager } from '@nestjs/typeorm';
+import { getActualListNewsLinks, getNewsContent } from './util/dom.util';
+import { InjectEntityManager } from '@nestjs/typeorm';
 
-import { DataSource, EntityManager } from 'typeorm';
+import { EntityManager } from 'typeorm';
+import { CommonService } from '@common/common.service';
 import { ENTITY_LIST } from '@constants/news.const';
-import { CreateMediaDto } from '@dto/media.dto';
-import { Media } from '@entities/media.entity';
-import { QueryDto } from '@dto/query.dto';
 import { parserConfig } from '@constants/parser.constant';
-import { getImages, getLinks, getText, prepareQuery } from '@util/parse.util';
-import { IResponseData, QueryResult } from '@types';
-import { News } from '@entities/news.entity';
+import { Media } from '@media/entities/media.entity';
+import { News } from '@news/entities/news.entity';
 
 @Injectable()
 export class AppService {
   constructor(
-    @InjectDataSource()
-    private dataSource: DataSource,
     @InjectEntityManager()
     private entityManager: EntityManager,
+    private readonly commonService: CommonService,
   ) {}
 
   async test(query: any) {
@@ -35,7 +26,7 @@ export class AppService {
 
     const arrayLinks = await getActualListNewsLinks(url);
 
-    const { data: media } = await this.getEntity<Media>('media', {
+    const { data: media } = await this.commonService.getData<Media>('media', {
       filter: {
         url,
       },
@@ -43,7 +34,7 @@ export class AppService {
 
     const mediaId = media[0].id;
 
-    const { data: news } = await this.getEntity<News>('news', {
+    const { data: news } = await this.commonService.getData<News>('news', {
       filter: {
         externalId: arrayLinks.map((url) => config.externalId(url)),
         mediaId,
@@ -58,10 +49,13 @@ export class AppService {
             .includes(config.externalCode(url)),
       )
       .map((url) =>
-        getNewsContent(url, config, mediaId).then((res) => ({ ...res, mediaId })),
+        getNewsContent(url, config, mediaId).then((res) => ({
+          ...res,
+          mediaId,
+        })),
       );
-      const data = await Promise.all(arrayNews);
-      return data 
+    const data = await Promise.all(arrayNews);
+    return data;
 
     const newData = data.filter(
       (item) =>
@@ -100,7 +94,7 @@ export class AppService {
 
       const arrayLinks = await getActualListNewsLinks(url);
 
-      const { data: news } = await this.getEntity<News>('news', {
+      const { data: news } = await this.commonService.getData<News>('news', {
         filter: {
           externalId: arrayLinks.map((url) => config.externalId(url)),
           mediaId,
@@ -115,7 +109,10 @@ export class AppService {
               .includes(config.externalCode(url)),
         )
         .map((url) =>
-          getNewsContent(url, config, mediaId).then((res) => ({ ...res, mediaId })),
+          getNewsContent(url, config, mediaId).then((res) => ({
+            ...res,
+            mediaId,
+          })),
         );
 
       const data = await Promise.all(arrayNews);
@@ -168,68 +165,10 @@ export class AppService {
     }
   }
 
-  getMedia(entityName: string, query: QueryDto<Media>): Promise<Media[]> {
-    return this.entityManager.find(Media);
-  }
-
-  postMedia(entityName: string, body: CreateMediaDto): Promise<any> {
-    return this.entityManager.insert(ENTITY_LIST[entityName].entity, body);
-  }
-
-  async getEntity<Entity>(
-    entityName: string,
-    query: QueryDto<Entity>,
-  ): Promise<IResponseData<Entity>> {
-    const entityConfig = ENTITY_LIST[entityName];
-    const { limit, skip, where, search, sort, select } = prepareQuery(query);
-    const [queryString, param] = this.dataSource
-      .createQueryBuilder()
-      .select(select)
-      .from(ENTITY_LIST[entityName].entity, 'news')
-      .where(where)
-      // .andWhere(
-      //   query.searchBy && entityConfig.searchFields
-      //     ? `contains((${entityConfig.searchFields}), '*${query.searchBy}*')`
-      //     : {},
-      // )
-      .andWhere(search)
-      .orderBy(sort)
-      .take(limit)
-      .skip(skip)
-      .getQueryAndParameters();
-    // console.log(queryString);
-    // console.log(where);
-
-    const [queryCountString, paramCount] = this.dataSource
-      .createQueryBuilder()
-      .select('count(*) as count')
-      .from(ENTITY_LIST[entityName].entity, 'news')
-      .where(where)
-      .andWhere(
-        query.searchBy && entityConfig.searchFields
-          ? `contains((${entityConfig.searchFields}), '*${query.searchBy}*')`
-          : {},
-      )
-      .andWhere(search)
-      .getQueryAndParameters();
-
-    const dataPromise = this.dataSource.query(queryString, param);
-    const countPromise = this.dataSource.query(queryCountString, paramCount);
-    const [data, countData] = await Promise.all([dataPromise, countPromise]);
-    // console.log(data);  
-    return { count: countData[0].count, data } as IResponseData<Entity>;
-
-    // return this.entityManager.find(ENTITY_LIST[entityName].entity);
-  }
-
   postEntity(
     entityName: string,
     body: Record<string, unknown>[],
   ): Promise<any> {
     return this.entityManager.insert(ENTITY_LIST[entityName].entity, body);
-  }
-
-  removeEntity(entityName: string, body: Record<string, unknown>[]) {
-    return this.entityManager.remove(ENTITY_LIST[entityName].entity, body);
   }
 }

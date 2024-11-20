@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ schema: 'news' })
+@Entity({ schema: 'news', name: 'media' })
 export class Media {
   @PrimaryGeneratedColumn({ comment: 'Идентификатор СМИ' })
   id: number;

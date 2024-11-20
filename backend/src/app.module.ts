@@ -6,6 +6,11 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TasksService } from '@task.service';
+import { MediaModule } from './media/media.module';
+import { NewsModule } from './news/news.module';
+import { CommonService } from '@common/common.service';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,8 +34,12 @@ import { TasksService } from '@task.service';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
+    MediaModule,
+    NewsModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TasksService],
+  providers: [AppService, TasksService, CommonService],
 })
 export class AppModule {}

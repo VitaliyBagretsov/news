@@ -1,6 +1,6 @@
-export type QueryResult = {
+export type ResponseResult<T> = {
   count: number;
-  data: any;
+  data: T[];
 };
 
 export interface IMedia {
