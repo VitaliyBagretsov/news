@@ -1,10 +1,10 @@
 import { EntityTarget } from 'typeorm';
-import { Log } from '@entities/log.entity';
-import { Link } from '@entities/link.entity';
-import { Image } from '@entities/image.entity';
-import { Media } from '@media/entities/media.entity';
-import { News } from '@news/entities/news.entity';
-import { User } from '@users/entities/user.entity';
+import { Log } from '#entities/log.entity';
+import { Link } from '#entities/link.entity';
+import { Image } from '#entities/image.entity';
+import { Media } from '#media/entities/media.entity';
+import { News } from '#news/entities/news.entity';
+import { User } from '#users/entities/user.entity';
 
 type SourceType = {
   from: string,

@@ -1,11 +1,23 @@
 {
   "name": "news",
   "version": "1.0.0",
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
+  },
   "main": "index.js",
   "scripts": {
+    "compose:check": "docker compose config --quiet",
+    "db:up": "docker compose up -d postgres",
+    "db:check": "docker compose exec postgres pg_isready -U news_user -d news_db",
+    "db:status": "docker compose ps postgres",
+    "db:logs": "docker compose logs -f postgres",
+    "db:stop": "docker compose stop postgres",
+    "db:down": "docker compose down",
+    "db:psql": "docker compose exec postgres psql -U news_user -d news_db",
     "front:dev": "cd frontend && npm run dev",
     "back:dev": "cd backend && npm run start:dev",
-    "back:start": "cd backend && npm run start"     
+    "back:start": "cd backend && npm run start"
   },
   "author": "",
   "license": "ISC",

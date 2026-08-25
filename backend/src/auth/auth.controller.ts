@@ -6,46 +6,40 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { AuthService } from './auth.service';
-import { AuthDto } from './dto/auth.dto';
-import { AccessTokenGuard } from '@common/guards/accessToken.guard';
-import { RefreshTokenGuard } from '@common/guards/refreshToken.guard';
-import { User } from '@decorators';
+import type { Request, Response } from 'express';
+
+import { SessionAuthGuard } from '#common/guards/session-auth.guard';
+import { AuthService } from './auth.service.js';
+import { LoginDto } from './dto/login.dto.js';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Get('user')
-  user(@User() user: string) {
-    return user
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() credentials: LoginDto, @Req() request: Request) {
+    const user = await this.authService.login(credentials, request);
+    return { authenticated: true, user };
   }
 
-  @Post('signup')
-  signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto);
+  @UseGuards(SessionAuthGuard)
+  @Get('session')
+  session(@Req() request: Request) {
+    return { authenticated: true, user: request.user };
   }
 
-  @Post('signin')
-  signin(@Body() data: AuthDto) {
-    return this.authService.signIn(data);
-  }
-
-  @UseGuards(AccessTokenGuard)
-  @Get('logout')
-  logout(@Req() req: Request) {
-    this.authService.logout(req.user['sub']);
-  }
-
-  @UseGuards(RefreshTokenGuard)
-  @Get('refresh')
-  refreshTokens(@Req() req: Request) {
-    const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.authService.logout(request);
+    response.clearCookie('news_session', { path: '/' });
+    return { authenticated: false };
   }
 }

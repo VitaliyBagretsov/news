@@ -1,18 +1,18 @@
+import { ConfigService } from '@nestjs/config';
+import { jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+
+import { AuthService } from './auth.service.js';
 
 describe('AuthService', () => {
-  let service: AuthService;
-
-  beforeEach(async () => {
+  it('is created with application configuration', async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        { provide: ConfigService, useValue: { getOrThrow: jest.fn() } },
+      ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(module.get(AuthService)).toBeDefined();
   });
 });

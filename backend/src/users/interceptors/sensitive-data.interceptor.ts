@@ -4,8 +4,8 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { ResponseResult } from '@types';
-import { User } from '@users/entities/user.entity';
+import { ResponseResult } from '#types';
+import { User } from '#users/entities/user.entity';
 import { Observable, map } from 'rxjs';
 
 const clearData = (data: User | User[] | ResponseResult<User>) => {

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NewsController } from './news.controller';
-import { NewsService } from './news.service';
+import { NewsController } from './news.controller.js';
+import { NewsService } from './news.service.js';
 
 describe('NewsController', () => {
   let controller: NewsController;

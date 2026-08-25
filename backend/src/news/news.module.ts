@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { CommonService } from '@common/common.service';
-import { NewsService } from './news.service';
-import { NewsController } from './news.controller';
+import { CommonService } from '#common/common.service';
+import { NewsService } from './news.service.js';
+import { NewsController } from './news.controller.js';
 
 @Module({
   controllers: [NewsController],

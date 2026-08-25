@@ -1,9 +1,9 @@
 import jsdom, { JSDOM } from 'jsdom';
-import { getHtmlByFetch } from './api.util';
-import { parserConfig } from '@constants/parser.constant';
-import { IParseConfig } from '@config/types.config';
-import { IParseNews } from '@types';
-import { getImages, getLinks, getText } from './parse.util';
+import { getHtmlByFetch } from './api.util.js';
+import { parserConfig } from '#constants/parser.constant';
+import { IParseConfig } from '#config/types.config';
+import { IParseNews } from '#types';
+import { getImages, getLinks, getText } from './parse.util.js';
 
 export const getDocuments = async (url: string): Promise<Document> => {
   return new JSDOM(await getHtmlByFetch(url)).window.document;

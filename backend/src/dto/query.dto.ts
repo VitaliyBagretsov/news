@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Allow, IsArray, IsOptional, IsNumber, Min } from 'class-validator';
-import { FindOptionsOrder } from 'typeorm';
+import type { FindOptionsOrder } from 'typeorm';
 
 type fullPrimitiveTypes = string | string[] | number | number [] | boolean | boolean[]
 

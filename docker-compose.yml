@@ -1,61 +1,66 @@
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    # env_file:
-    #   - './frontend/.env.local'  
-    container_name: news-frontend
-    networks:
-      - webnet
-    restart: unless-stopped
-    volumes:
-      - frontend_dist:/news/frontend/dist
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: news-frontend
+  #   networks:
+  #     - news_network
+  #   restart: unless-stopped
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: news-backend
-    env_file:
-      - './backend/.env'  
-    ports:
-      - '3000:3000'
-    networks:
-      - webnet
-    restart: unless-stopped  
-    depends_on:
-      - postgres
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: news-backend
+  #   env_file:
+  #     - ./.env
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - news_network
+  #   restart: unless-stopped
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
-  nginx:
-    image: nginx:latest
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - webnet
-    restart: always
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - frontend_dist:/var/www/frontend:ro 
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: news-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   networks:
+  #     - news_network
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
   postgres:
-    image: postgres:14.1-alpine
-    restart: always
-    container_name: postgres
+    image: postgres:${POSTGRES_VERSION}
+    container_name: news-postgres
+    restart: unless-stopped
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - '5431:5432'
-    volumes: 
-      - postgres_data:/var/lib/postgresql/data
+      - "${POSTGRES_HOST_PORT}:5432"
+    volumes:
+      - news_postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     networks:
-      - webnet
+      - news_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
-  postgres_data:
-  frontend_dist:
+  news_postgres_data:
 
 networks:
-  webnet:
+  news_network:
+    driver: bridge

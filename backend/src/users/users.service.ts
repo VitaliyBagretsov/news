@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { hashPassword } from './utils';
-import { NotFoundException } from '@exceptions/not-found.exception';
-import { UserExistException } from '@exceptions/user-exist.exception';
-import { EmailUsedException } from '@exceptions/email-used.exception';
-import { News } from '@news/entities/news.entity';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import { User } from './entities/user.entity.js';
+import { hashPassword } from './utils/index.js';
+import { NotFoundException } from '#exceptions/not-found.exception';
+import { UserExistException } from '#exceptions/user-exist.exception';
+import { EmailUsedException } from '#exceptions/email-used.exception';
+import { News } from '#news/entities/news.entity';
 
 @Injectable()
 export class UsersService {

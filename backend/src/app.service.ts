@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
-import { getActualListNewsLinks, getNewsContent } from './util/dom.util';
+import { getActualListNewsLinks, getNewsContent } from './util/dom.util.js';
 import { InjectEntityManager } from '@nestjs/typeorm';
 
 import { EntityManager } from 'typeorm';
-import { CommonService } from '@common/common.service';
-import { ENTITY_LIST } from '@constants/news.const';
-import { parserConfig } from '@constants/parser.constant';
-import { Media } from '@media/entities/media.entity';
-import { News } from '@news/entities/news.entity';
+import { CommonService } from '#common/common.service';
+import { ENTITY_LIST } from '#constants/news.const';
+import { parserConfig } from '#constants/parser.constant';
+import { Media } from '#media/entities/media.entity';
+import { News } from '#news/entities/news.entity';
 
 @Injectable()
 export class AppService {
@@ -91,13 +91,20 @@ export class AppService {
   async writeNews(url: string, mediaId?: number) {
     try {
       const config = parserConfig.find((item) => url.includes(item.baseUrl));
+      const targetMediaId =
+        mediaId ??
+        (
+          await this.entityManager.findOneByOrFail(Media, {
+            url: url.replace(/\/+$/, ''),
+          })
+        ).id;
 
       const arrayLinks = await getActualListNewsLinks(url);
 
       const { data: news } = await this.commonService.getData<News>('news', {
         filter: {
           externalId: arrayLinks.map((url) => config.externalId(url)),
-          mediaId,
+          mediaId: targetMediaId,
         },
       });
 
@@ -109,9 +116,9 @@ export class AppService {
               .includes(config.externalCode(url)),
         )
         .map((url) =>
-          getNewsContent(url, config, mediaId).then((res) => ({
+          getNewsContent(url, config, targetMediaId).then((res) => ({
             ...res,
-            mediaId,
+            mediaId: targetMediaId,
           })),
         );
 

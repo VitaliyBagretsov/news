@@ -1,7 +1,7 @@
-import { AppService } from '@app.service';
-import { CommonService } from '@common/common.service';
-import { parserConfig } from '@constants/parser.constant';
-import { Media } from '@media/entities/media.entity';
+import { AppService } from '#app.service';
+import { CommonService } from '#common/common.service';
+import { parserConfig } from '#constants/parser.constant';
+import { Media } from '#media/entities/media.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 

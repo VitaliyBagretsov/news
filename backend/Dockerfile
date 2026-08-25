@@ -1,25 +1,24 @@
 # news/backend/Dockerfile
-FROM node:20-alpine as builder
+FROM node:22-alpine AS builder
 
 WORKDIR /news
 
-COPY package.json ./
+COPY package*.json ./
 
-RUN yarn install
+RUN npm ci
 
 COPY . .
 
-RUN yarn build
+RUN npm run build
 
-FROM node:20-alpine as production
+FROM node:22-alpine AS production
 WORKDIR /news
 
 COPY --from=builder /news/package*.json ./
 
-RUN yarn --prod
+RUN npm ci --omit=dev
 
 COPY --from=builder /news/dist ./dist/
-COPY --from=builder /news/public ./public/
 
 EXPOSE 3000
 

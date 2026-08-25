@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { IResponseData } from '@types';
-import { ENTITY_LIST } from '@constants/news.const';
-import { QueryDto } from '@dto/query.dto';
-import { prepareQuery } from '@util/parse.util';
+import { IResponseData } from '#types';
+import { ENTITY_LIST } from '#constants/news.const';
+import { QueryDto } from '#dto/query.dto';
+import { prepareQuery } from '#util/parse.util';
 
 @Injectable()
 export class CommonService {
