@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
-import { SessionAuthGuard } from '#common/guards/session-auth.guard';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
+import { SessionAuthGuard } from './guards/session-auth.guard.js';
 
 @Controller('auth')
 export class AuthController {

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getEntityManagerToken } from '@nestjs/typeorm';
 import { MediaService } from './media.service.js';
 
 describe('MediaService', () => {
@@ -6,7 +7,13 @@ describe('MediaService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MediaService],
+      providers: [
+        MediaService,
+        {
+          provide: getEntityManagerToken(),
+          useValue: {},
+        },
+      ],
     }).compile();
 
     service = module.get<MediaService>(MediaService);

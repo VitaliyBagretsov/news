@@ -1,18 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity({ schema: 'news' })
 export class Log {
-
   @PrimaryGeneratedColumn({ comment: 'ID' })
   id: number;
 
   @Column({ comment: 'Тип' })
-  type: string
+  type: string;
 
   @Column({ comment: 'Значение' })
-  value: string
+  value: string;
 
   @CreateDateColumn({ comment: 'timestamp' })
-  timestamp: Date
-
+  timestamp: Date;
 }

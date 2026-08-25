@@ -1,7 +1,7 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { AuthenticatedUser } from '#auth/auth-session.types';
+import type { AuthenticatedUser } from '../auth-session.types.js';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

@@ -7,7 +7,6 @@ import { NotFoundException } from '#exceptions/not-found.exception';
 
 @Injectable()
 export class NewsService {
-
   constructor(
     @InjectEntityManager()
     private entityManager: EntityManager,
@@ -19,5 +18,4 @@ export class NewsService {
       return res;
     });
   }
-
 }

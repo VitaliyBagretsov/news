@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-import style from './style.module.scss'
+import style from './style.module.scss';
 
 export const NavBack = () => {
   const navigate = useNavigate();
-  
+
   const onClick = () => {
     navigate(-1);
   };
@@ -13,5 +13,5 @@ export const NavBack = () => {
     <button className={style.buttonBack} onClick={onClick}>
       Назад
     </button>
-  )
-}
+  );
+};

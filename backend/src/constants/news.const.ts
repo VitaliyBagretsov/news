@@ -1,18 +1,18 @@
 import { EntityTarget } from 'typeorm';
-import { Log } from '#entities/log.entity';
-import { Link } from '#entities/link.entity';
-import { Image } from '#entities/image.entity';
-import { Media } from '#media/entities/media.entity';
-import { News } from '#news/entities/news.entity';
-import { User } from '#users/entities/user.entity';
+import { Image } from '../entities/image.entity.js';
+import { Link } from '../entities/link.entity.js';
+import { Log } from '../entities/log.entity.js';
+import { Media } from '../media/entities/index.js';
+import { News } from '../news/entities/index.js';
+import { User } from '../users/entities/index.js';
 
 type SourceType = {
-  from: string,
-  entity: EntityTarget<Record<string, unknown>>,
-  searchFields?: string
-}
+  from: string;
+  entity: EntityTarget<Record<string, unknown>>;
+  searchFields?: string;
+};
 
-export const ENTITY_LIST: {[key:string]: SourceType} = {
+export const ENTITY_LIST: { [key: string]: SourceType } = {
   user: {
     from: 'user',
     entity: User,
@@ -24,24 +24,24 @@ export const ENTITY_LIST: {[key:string]: SourceType} = {
   news: {
     from: 'news-view',
     entity: News,
-    searchFields: '"header","summary","text"'
+    searchFields: '"header","summary","text"',
   },
   log: {
     from: 'log',
     entity: Log,
-    searchFields: '"type","value"'
+    searchFields: '"type","value"',
   },
   link: {
     from: 'link',
     entity: Link,
-    searchFields: '"url"'
+    searchFields: '"url"',
   },
   image: {
     from: 'image',
     entity: Image,
-    searchFields: '"url"'
+    searchFields: '"url"',
   },
-}
+};
 
-export const DEFAULT_LIMIT = 100
-export const DEFAULT_OFFSET = 0
+export const DEFAULT_LIMIT = 100;
+export const DEFAULT_OFFSET = 0;

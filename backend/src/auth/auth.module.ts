@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { RolesGuard } from '#common/guards/role.guard';
-import { SessionAuthGuard } from '#common/guards/session-auth.guard';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
+import { RolesGuard, SessionAuthGuard } from './guards/index.js';
 
 @Module({
   controllers: [AuthController],

@@ -6,65 +6,29 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#app.service": {
-      "types": "./src/app.service.ts",
-      "default": "./dist/app.service.js"
+    "#auth": {
+      "types": "./src/auth/index.ts",
+      "default": "./dist/auth/index.js"
     },
-    "#task.service": {
-      "types": "./src/task.service.ts",
-      "default": "./dist/task.service.js"
-    },
-    "#auth/*": {
-      "types": "./src/auth/*.ts",
-      "default": "./dist/auth/*.js"
-    },
-    "#common/*": {
-      "types": "./src/common/*.ts",
-      "default": "./dist/common/*.js"
-    },
-    "#config/*": {
-      "types": "./src/config/*.ts",
-      "default": "./dist/config/*.js"
-    },
-    "#constants/*": {
-      "types": "./src/constants/*.ts",
-      "default": "./dist/constants/*.js"
-    },
-    "#decorators": {
-      "types": "./src/decorators/index.ts",
-      "default": "./dist/decorators/index.js"
-    },
-    "#dto/*": {
-      "types": "./src/dto/*.ts",
-      "default": "./dist/dto/*.js"
-    },
-    "#entities/*": {
-      "types": "./src/entities/*.ts",
-      "default": "./dist/entities/*.js"
+    "#common": {
+      "types": "./src/common/index.ts",
+      "default": "./dist/common/index.js"
     },
     "#exceptions/*": {
       "types": "./src/exceptions/*.ts",
       "default": "./dist/exceptions/*.js"
     },
-    "#media/*": {
-      "types": "./src/media/*.ts",
-      "default": "./dist/media/*.js"
+    "#media": {
+      "types": "./src/media/index.ts",
+      "default": "./dist/media/index.js"
     },
-    "#news/*": {
-      "types": "./src/news/*.ts",
-      "default": "./dist/news/*.js"
+    "#news": {
+      "types": "./src/news/index.ts",
+      "default": "./dist/news/index.js"
     },
-    "#types": {
-      "types": "./src/types/index.ts",
-      "default": "./dist/types/index.js"
-    },
-    "#users/*": {
-      "types": "./src/users/*.ts",
-      "default": "./dist/users/*.js"
-    },
-    "#util/*": {
-      "types": "./src/util/*.ts",
-      "default": "./dist/util/*.js"
+    "#users": {
+      "types": "./src/users/index.ts",
+      "default": "./dist/users/index.js"
     }
   },
   "engines": {
@@ -75,12 +39,16 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit --incremental false",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:ci": "npm test -- --runInBand",
     "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
     "test:cov": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "test:debug": "node --inspect-brk --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
@@ -148,9 +116,9 @@
     "testRegex": ".*\\.spec\\.ts$",
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1",
-      "^#(app\\.service|task\\.service)$": "<rootDir>/$1",
-      "^#(auth|common|config|constants|dto|entities|exceptions|media|news|users|util)/(.*)$": "<rootDir>/$1/$2",
-      "^#(decorators|types)$": "<rootDir>/$1/index"
+      "^#auth$": "<rootDir>/auth/index",
+      "^#(common|media|news|users)$": "<rootDir>/$1/index",
+      "^#exceptions/(.*)$": "<rootDir>/exceptions/$1"
     },
     "extensionsToTreatAsEsm": [
       ".ts"

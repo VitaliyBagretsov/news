@@ -1,4 +1,4 @@
-import { IParseConfig } from '#config/types.config';
+import { IParseConfig } from '../config/types.config.js';
 
 export const parserConfig: IParseConfig[] = [
   {

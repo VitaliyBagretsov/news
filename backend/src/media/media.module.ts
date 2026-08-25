@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthModule } from '#auth/auth.module';
-import { CommonService } from '#common/common.service';
+import { AuthModule } from '#auth';
+import { CommonService } from '#common';
 
 import { MediaService } from './media.service.js';
 import { MediaController } from './media.controller.js';

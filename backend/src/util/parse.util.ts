@@ -1,6 +1,6 @@
-import { DEFAULT_LIMIT, DEFAULT_OFFSET } from '#constants/news.const';
-import { QueryDto } from '#dto/query.dto';
-import { IImage, ILink } from '#types';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET } from '../constants/news.const.js';
+import { QueryDto } from '../dto/query.dto.js';
+import { IImage, ILink } from '../types/index.js';
 import { In, ILike } from 'typeorm';
 
 export const calculateSkip = (pageNumber: number, perPage: number): number => {

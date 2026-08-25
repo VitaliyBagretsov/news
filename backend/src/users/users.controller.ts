@@ -13,10 +13,10 @@ import {
 import { UsersService } from './users.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
-import { CommonService } from '#common/common.service';
+import { CommonService } from '#common';
 import { User } from './entities/user.entity.js';
 import { SensitiveDataInterceptor } from './interceptors/sensitive-data.interceptor.js';
-import { SessionAuthGuard } from '#common/guards/session-auth.guard';
+import { SessionAuthGuard } from '#auth';
 
 @UseInterceptors(SensitiveDataInterceptor)
 @UseGuards(SessionAuthGuard)

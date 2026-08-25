@@ -10,14 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { RolesGuard } from '#common/guards/role.guard';
-import { SessionAuthGuard } from '#common/guards/session-auth.guard';
-import { CommonService } from '#common/common.service';
+import { Roles, RolesGuard, SessionAuthGuard } from '#auth';
+import { CommonService } from '#common';
 import { MediaService } from './media.service.js';
 import { CreateMediaDto } from './dto/create-media.dto.js';
 import { UpdateMediaDto } from './dto/update-media.dto.js';
 import { Media } from './entities/media.entity.js';
-import { Roles } from '#decorators';
 
 @Controller('media')
 export class MediaController {

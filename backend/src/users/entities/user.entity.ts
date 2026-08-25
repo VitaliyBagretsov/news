@@ -1,4 +1,3 @@
-import { IsString, Max, Min } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ schema: 'news' })

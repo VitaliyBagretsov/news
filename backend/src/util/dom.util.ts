@@ -1,8 +1,8 @@
-import jsdom, { JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom';
 import { getHtmlByFetch } from './api.util.js';
-import { parserConfig } from '#constants/parser.constant';
-import { IParseConfig } from '#config/types.config';
-import { IParseNews } from '#types';
+import { IParseConfig } from '../config/types.config.js';
+import { parserConfig } from '../constants/parser.constant.js';
+import { IParseNews } from '../types/index.js';
 import { getImages, getLinks, getText } from './parse.util.js';
 
 export const getDocuments = async (url: string): Promise<Document> => {
@@ -29,8 +29,11 @@ export const getActualListNewsLinks = async (mediaUrl: string) => {
     .filter((item) => filterNews(item, mediaUrl));
 };
 
-export const getNewsContent = async (url: string, config: IParseConfig, mediaId?: number): Promise<IParseNews> => {
-
+export const getNewsContent = async (
+  url: string,
+  config: IParseConfig,
+  mediaId?: number,
+): Promise<IParseNews> => {
   const article = await getDocuments(url);
   const externalCode = config.externalCode(url);
   const externalId = config.externalId(url);
@@ -55,20 +58,16 @@ export const getNewsContent = async (url: string, config: IParseConfig, mediaId?
       mediaId,
       externalId,
       externalCode,
-      date: config.getDate(
-        article.querySelector(config.selectors.date),
-      ),
+      date: config.getDate(article.querySelector(config.selectors.date)),
       header:
         article
           .querySelector(config.selectors.header)
           ?.textContent.substring(0, 99) ?? '',
-      summary: article.querySelector(config.selectors.summary)
-        ?.textContent,
+      summary: article.querySelector(config.selectors.summary)?.textContent,
       text,
       url,
     },
     links,
     images,
   };
-
-}
+};

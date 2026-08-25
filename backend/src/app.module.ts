@@ -5,14 +5,14 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { AuthModule } from '#auth';
+import { CommonService } from '#common';
+import { MediaModule } from '#media';
+import { NewsModule } from '#news';
+import { UsersModule } from '#users';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { TasksService } from '#task.service';
-import { MediaModule } from './media/media.module.js';
-import { NewsModule } from './news/news.module.js';
-import { CommonService } from '#common/common.service';
-import { UsersModule } from './users/users.module.js';
-import { AuthModule } from './auth/auth.module.js';
+import { TasksService } from './task.service.js';
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 

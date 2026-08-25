@@ -2,7 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Allow, IsArray, IsOptional, IsNumber, Min } from 'class-validator';
 import type { FindOptionsOrder } from 'typeorm';
 
-type fullPrimitiveTypes = string | string[] | number | number [] | boolean | boolean[]
+type fullPrimitiveTypes =
+  string | string[] | number | number[] | boolean | boolean[];
 
 export class QueryDto<Entity = any> {
   @ApiProperty({

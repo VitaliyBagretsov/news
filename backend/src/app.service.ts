@@ -4,11 +4,11 @@ import { getActualListNewsLinks, getNewsContent } from './util/dom.util.js';
 import { InjectEntityManager } from '@nestjs/typeorm';
 
 import { EntityManager } from 'typeorm';
-import { CommonService } from '#common/common.service';
-import { ENTITY_LIST } from '#constants/news.const';
-import { parserConfig } from '#constants/parser.constant';
-import { Media } from '#media/entities/media.entity';
-import { News } from '#news/entities/news.entity';
+import { CommonService } from '#common';
+import { ENTITY_LIST } from './constants/news.const.js';
+import { parserConfig } from './constants/parser.constant.js';
+import { Media } from './media/entities/index.js';
+import { News } from './news/entities/index.js';
 
 @Injectable()
 export class AppService {
@@ -133,7 +133,7 @@ export class AppService {
 
       console.log(`Новых новостей(${url}) - ${newData.length}`);
       if (newData.length > 0) {
-        const insertNews = await this.postEntity(
+        await this.postEntity(
           'news',
           newData.map((item) => item.news),
         );

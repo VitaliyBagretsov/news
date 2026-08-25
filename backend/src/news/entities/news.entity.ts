@@ -6,17 +6,17 @@ export class News {
   id: number;
 
   @Column({
-    comment: 'Идентификатор СМИ'
+    comment: 'Идентификатор СМИ',
   })
   mediaId: number;
 
   @Column({
-    comment: 'Внешний идентификатор новости'
+    comment: 'Внешний идентификатор новости',
   })
   externalId: string;
 
   @Column({
-    comment: 'Внешний код новости'
+    comment: 'Внешний код новости',
   })
   externalCode: string;
 
@@ -48,7 +48,7 @@ export class News {
     comment: 'Подробный текст новости',
   })
   text: string;
-  
+
   @Column({
     type: 'varchar',
     length: 500,
@@ -57,5 +57,4 @@ export class News {
     comment: 'Ссылка на новость',
   })
   url: string;
-
 }

@@ -1,5 +1,5 @@
-import { INews } from '../../entities/types';
-import { convertTZ } from '../../shared/utils/parse.util';
+import { INews } from '@/entities';
+import { convertTZ } from '@/shared/utils/parse.util';
 import style from './style.module.scss';
 
 const NewsContent = (props: INews) => {

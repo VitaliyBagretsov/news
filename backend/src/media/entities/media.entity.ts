@@ -20,7 +20,7 @@ export class Media {
     comment: 'Описание СМИ',
   })
   description: string;
-  
+
   @Column({
     type: 'varchar',
     length: 500,
@@ -45,7 +45,7 @@ export class Media {
     comment: 'Контакты СМИ',
   })
   contact: string;
-  
+
   @Column({
     type: 'varchar',
     length: 300,

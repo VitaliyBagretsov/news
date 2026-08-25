@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
 import type { Request, Response } from 'express';
 
-import { SessionAuthGuard } from '#common/guards/session-auth.guard';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
+import { SessionAuthGuard } from './guards/session-auth.guard.js';
 
 describe('AuthController', () => {
   let controller: AuthController;

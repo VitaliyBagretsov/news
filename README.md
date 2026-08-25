@@ -26,6 +26,51 @@ npm ci
 npm run build
 ```
 
+### Форматирование
+
+Общие правила Prettier для backend и frontend находятся в корневом файле
+`.prettierrc.json`. Они явно фиксируют ширину строки 100 символов, отступ в два
+пробела, точки с запятой, одинарные кавычки, trailing commas и окончания строк
+LF.
+
+Проверить форматирование всего проекта без изменения файлов:
+
+```bash
+npm run format:check
+```
+
+Применить форматирование:
+
+```bash
+npm run format
+```
+
+Backend использует нативные package aliases Node.js с обязательным префиксом
+`#` только для публичных feature entrypoints (`#auth`, `#common`, `#media`,
+`#news`, `#users`) и общего семейства исключений `#exceptions/*`. Внутренние
+файлы, entities, DTO, types, constants и utils используют относительные
+ESM-импорты. Frontend использует alias `@/`, который одинаково настроен в
+`frontend/tsconfig.json` и `frontend/vite.config.ts`.
+
+### Автоматические проверки
+
+Из корня репозитория доступны единые команды для backend и frontend:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+ESLint работает в проверочном режиме и не изменяет файлы. Для явного
+автоматического исправления отдельного приложения используйте его команду
+`npm run lint:fix`.
+
+Husky устанавливается корневой командой `npm install`; script `prepare`
+настраивает Git hooks. Перед каждым commit файл `.husky/pre-commit`
+последовательно запускает typecheck, ESLint и unit-тесты backend и frontend. Если
+любая проверка завершается с ошибкой, commit не создаётся.
+
 ## Этап 1: локальный PostgreSQL
 
 На текущем этапе в `docker-compose.yml` активен только PostgreSQL. Остальные

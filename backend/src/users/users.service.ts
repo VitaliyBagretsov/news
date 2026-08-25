@@ -9,7 +9,6 @@ import { hashPassword } from './utils/index.js';
 import { NotFoundException } from '#exceptions/not-found.exception';
 import { UserExistException } from '#exceptions/user-exist.exception';
 import { EmailUsedException } from '#exceptions/email-used.exception';
-import { News } from '#news/entities/news.entity';
 
 @Injectable()
 export class UsersService {
@@ -45,7 +44,7 @@ export class UsersService {
   }
 
   findByName(name: string) {
-    return this.entityManager.findOneBy(User, {name});
+    return this.entityManager.findOneBy(User, { name });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
