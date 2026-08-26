@@ -6,27 +6,30 @@ import { IParseNews } from '../types/index.js';
 import { getImages, getLinks, getText } from './parse.util.js';
 
 export const getDocuments = async (url: string): Promise<Document> => {
-  return new JSDOM(await getHtmlByFetch(url)).window.document;
+  return new JSDOM(await getHtmlByFetch(url), { url }).window.document;
 };
 
-export const filterNews = (item, url) => {
-  if (url.includes('rambler')) return true;
+export const filterNews = (item: string, sourceUrl: string): boolean => {
+  if (sourceUrl.includes('rambler')) return true;
   if (item.includes('cnComments')) return false;
-  return item.startsWith(url);
+  return new URL(item).hostname === new URL(sourceUrl).hostname;
 };
 
-export const getActualListNewsLinks = async (mediaUrl: string) => {
+export const getActualListNewsLinks = async (
+  mediaUrl: string,
+): Promise<string[]> => {
   const document = await getDocuments(mediaUrl);
   const config = parserConfig.find((item) => mediaUrl.includes(item.baseUrl));
 
-  const startLink = /^https:\/\//;
+  if (!config) throw new Error(`Parser config is not defined for ${mediaUrl}`);
 
-  return Array.from(document.querySelectorAll(config.selectors.news))
-    .map(
-      (item: HTMLAnchorElement) =>
-        `${startLink.test(item.href) ? '' : mediaUrl}${item.href}`,
-    )
-    .filter((item) => filterNews(item, mediaUrl));
+  return [
+    ...new Set(
+      Array.from(document.querySelectorAll(config.selectors.news))
+        .map((item: HTMLAnchorElement) => new URL(item.href, mediaUrl).href)
+        .filter((item) => filterNews(item, mediaUrl)),
+    ),
+  ];
 };
 
 export const getNewsContent = async (
@@ -63,7 +66,9 @@ export const getNewsContent = async (
         article
           .querySelector(config.selectors.header)
           ?.textContent.substring(0, 99) ?? '',
-      summary: article.querySelector(config.selectors.summary)?.textContent,
+      summary:
+        article.querySelector(config.selectors.summary)?.textContent?.trim() ??
+        '',
       text,
       url,
     },

@@ -11,12 +11,17 @@ export class Link {
   @Column({ comment: 'Url новости' })
   newsUrl: string;
 
-  @Column({ comment: 'адрес ссылки' })
+  @Column({ type: 'text', nullable: true, comment: 'адрес ссылки' })
   href: string;
 
-  @Column({ comment: 'тип ссылки' })
+  @Column({ type: 'text', nullable: true, default: '', comment: 'тип ссылки' })
   rel: string;
 
-  @Column({ comment: 'Текст гиперссылки' })
+  @Column({
+    type: 'text',
+    nullable: true,
+    default: '',
+    comment: 'Текст гиперссылки',
+  })
   textContent: string;
 }

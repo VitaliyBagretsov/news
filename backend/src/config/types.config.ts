@@ -6,6 +6,14 @@ export interface IParseConfig {
   getDate: (element: HTMLElement) => Date;
 }
 
+export interface ICollectionResult {
+  source: string;
+  discovered: number;
+  added: number;
+  skipped: number;
+  failed: number;
+}
+
 export interface IListNews {
   date: string;
   text: string;

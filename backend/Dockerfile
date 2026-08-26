@@ -1,4 +1,3 @@
-# news/backend/Dockerfile
 FROM node:22-alpine AS builder
 
 WORKDIR /news
@@ -22,4 +21,4 @@ COPY --from=builder /news/dist ./dist/
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]

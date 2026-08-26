@@ -6,7 +6,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { AuthModule } from '#auth';
-import { CommonService } from '#common';
 import { MediaModule } from '#media';
 import { NewsModule } from '#news';
 import { UsersModule } from '#users';
@@ -25,6 +24,8 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
+        const synchronize = configService.get<string>('TYPEORM_SYNCHRONIZE');
+
         return {
           type: 'postgres',
           host: configService.getOrThrow<string>('POSTGRES_HOST'),
@@ -32,7 +33,10 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
           username: configService.getOrThrow<string>('POSTGRES_USER'),
           password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
           database: configService.getOrThrow<string>('POSTGRES_DB'),
-          synchronize: true,
+          synchronize:
+            synchronize === undefined
+              ? process.env.NODE_ENV !== 'production'
+              : synchronize === 'true',
           entities: [join(moduleDirectory, '**', '*.entity{.js,.ts}')],
         };
       },
@@ -45,6 +49,6 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TasksService, CommonService],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}

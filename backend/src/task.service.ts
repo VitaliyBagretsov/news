@@ -1,35 +1,68 @@
-import { AppService } from './app.service.js';
-import { CommonService } from '#common';
-import { parserConfig } from './constants/parser.constant.js';
-import { Media } from './media/entities/index.js';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
+
+import { AppService } from './app.service.js';
+import { Media } from './media/entities/index.js';
 
 @Injectable()
-export class TasksService {
+export class TasksService implements OnApplicationBootstrap {
   private readonly logger = new Logger(TasksService.name);
-  private timerMitutes: number = 5;
+  private collectionIsRunning = false;
 
   constructor(
     private readonly appService: AppService,
-    private readonly commonService: CommonService,
+    private readonly configService: ConfigService,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) {}
 
-  @Cron(`0 */5 * * * *`)
-  async cronWriteNews() {
-    const list = await this.commonService.getData<Media>('media', {
-      filter: { isActive: true },
-    });
+  async onApplicationBootstrap(): Promise<void> {
+    const runOnStart =
+      this.configService.get<string>('PARSER_RUN_ON_START') ?? 'true';
 
-    this.logger.debug(
-      `Called every ${this.timerMitutes} minute for media: ${JSON.stringify(
-        list.data.map((media) => media.url),
-      )}`,
-    );
+    if (runOnStart === 'true') {
+      setImmediate(() => void this.collectNews('startup'));
+    }
+  }
 
-    list.data.forEach((media: Media) => {
-      if (parserConfig.find((item) => media.url.includes(item.baseUrl)))
-        this.appService.writeNews(media.url, media.id);
-    });
+  @Cron('0 */5 * * * *', { name: 'news-collection' })
+  async cronWriteNews(): Promise<void> {
+    await this.collectNews('schedule');
+  }
+
+  private async collectNews(trigger: 'schedule' | 'startup'): Promise<void> {
+    if (this.collectionIsRunning) {
+      this.logger.warn(
+        `Skipping ${trigger} run: collection is already running`,
+      );
+      return;
+    }
+
+    this.collectionIsRunning = true;
+
+    try {
+      const mediaList = await this.entityManager.findBy(Media, {
+        isActive: true,
+      });
+
+      this.logger.log(
+        `Starting ${trigger} collection for ${mediaList.length} source(s)`,
+      );
+
+      for (const media of mediaList) {
+        try {
+          await this.appService.writeNews(media.url, media.id);
+        } catch (error) {
+          this.logger.error(
+            `Source collection failed for ${media.url}: ${String(error)}`,
+          );
+        }
+      }
+    } finally {
+      this.collectionIsRunning = false;
+    }
   }
 }

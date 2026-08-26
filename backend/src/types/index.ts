@@ -32,13 +32,13 @@ export interface INews {
 
 export interface ILink {
   href: string;
-  rel: string;
-  textContent: string;
+  rel?: string;
+  textContent?: string;
 }
 
 export interface IImage {
   src: string;
-  alt: string;
+  alt?: string;
 }
 
 export interface IResponseData<T> {

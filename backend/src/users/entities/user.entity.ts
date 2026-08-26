@@ -20,18 +20,4 @@ export class User {
     comment: 'E-mail',
   })
   email: string;
-
-  @Column({
-    unique: true,
-    type: 'varchar',
-    length: 1000,
-    comment: 'Пароль',
-  })
-  password: string;
-
-  @Column({
-    nullable: true,
-    comment: 'refresh-token',
-  })
-  refreshToken: string;
 }

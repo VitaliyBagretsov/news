@@ -71,10 +71,12 @@ Husky устанавливается корневой командой `npm inst
 последовательно запускает typecheck, ESLint и unit-тесты backend и frontend. Если
 любая проверка завершается с ошибкой, commit не создаётся.
 
-## Этап 1: локальный PostgreSQL
+## Локальные контейнеры
 
-На текущем этапе в `docker-compose.yml` активен только PostgreSQL. Остальные
-сервисы закомментированы и будут подключаться по одному после отдельной проверки.
+`docker-compose.yml` запускает PostgreSQL и News backend. Frontend пока не входит
+в Compose и продолжает запускаться отдельно. Backend собирается многоэтапным
+Dockerfile на Node.js 22, ожидает готовности PostgreSQL и предоставляет
+healthcheck `GET /api/health`.
 
 ### Переменные окружения
 
@@ -85,8 +87,7 @@ Compose читает настройки из корневого файла `.env
 Этот же корневой `.env` читает backend. Для подключения к PostgreSQL используются
 `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER` и
 `POSTGRES_PASSWORD`. При локальном запуске backend значение `POSTGRES_HOST`
-равно `localhost`; после включения backend в Compose оно будет переопределено на
-имя сервиса `postgres`.
+равно `localhost`; внутри Compose оно переопределяется именем сервиса `postgres`.
 
 Авторизация backend использует Keycloak по протоколу OpenID Connect. Все
 настройки, включая `KEYCLOAK_CLIENT_SECRET` и `SESSION_SECRET`, задаются в том
@@ -99,7 +100,7 @@ Compose читает настройки из корневого файла `.env
 cp .env.example .env
 ```
 
-### Запуск и проверка
+### Запуск только PostgreSQL
 
 ```bash
 npm run compose:check
@@ -121,11 +122,34 @@ PostgreSQL доступен с хоста по адресу `localhost:5432`. Д
 именованном Docker volume `news_news_postgres_data`.
 
 При первой инициализации нового volume PostgreSQL выполняет SQL-файлы из
-`docker/postgres/init` и создаёт схему `news`, используемую TypeORM-сущностями.
+`docker/postgres/init`, создаёт схему `news` и начальные таблицы. Локально
+`TYPEORM_SYNCHRONIZE=true` разрешает TypeORM синхронизировать учебную схему с
+entities. В production синхронизация отключена.
+
+### Запуск PostgreSQL и backend
+
+```bash
+npm run compose:check
+npm run stack:up
+npm run stack:status
+curl http://localhost:3000/api/health
+```
+
+Совместные логи backend и PostgreSQL:
+
+```bash
+npm run stack:logs
+```
+
+Остановка с сохранением volume:
+
+```bash
+npm run stack:down
+```
 
 ### Остановка
 
-Остановить контейнер, сохранив данные:
+Остановить PostgreSQL, сохранив данные:
 
 ```bash
 npm run db:down
@@ -139,6 +163,59 @@ docker compose down --volumes
 
 Последняя команда необратимо удаляет локальную базу и используется только когда
 данные больше не нужны.
+
+## Автономный сбор новостей
+
+Единственный источник списка сайтов для сбора — таблица `news.media`. Backend
+выбирает из неё записи с `isActive=true`; URL должен соответствовать одному из
+технических описаний селекторов в `parserConfig`. Если `PARSER_RUN_ON_START=true`,
+первый сбор начинается сразу после готовности приложения. Далее Nest scheduler
+запускает сбор каждые пять минут.
+
+```dotenv
+PARSER_MAX_ARTICLES_PER_RUN=20
+PARSER_RUN_ON_START=true
+```
+
+За один проход backend:
+
+1. читает активные записи `news.media`;
+2. получает уникальные ссылки на статьи и ограничивает их количество;
+3. пропускает уже сохранённые пары `mediaId + externalCode`;
+4. сохраняет каждую новость, её ссылки и изображения в одной транзакции;
+5. записывает отдельные ошибки статей в `news.log` и продолжает остальные;
+6. не начинает новый проход, пока предыдущий не завершён.
+
+Сетевые запросы имеют тайм-аут 15 секунд и проверяют HTTP status. Ручные
+диагностические endpoints `/api/test` и `/api/write-news` удалены: сбор является
+внутренней фоновой задачей. Актуальные селекторы RT были проверены на главной
+странице и отдельной статье.
+
+Локальная таблица `news.user` остаётся таблицей профилей с полями `id`, `name` и
+`email`. Поля `password` и `refreshToken`, локальное хеширование и скрывающий
+пароли interceptor удалены. Учётные данные и токены авторизации принадлежат
+Keycloak и серверной таблице сессий, а не `news.user`.
+
+## Подготовка production Compose
+
+`docker-compose.prod.yml` предназначен для будущего запуска backend и PostgreSQL
+на ВМ. PostgreSQL не публикует порт на хост, backend доступен только на
+`127.0.0.1:${BACKEND_HOST_PORT}` и в дальнейшем должен быть подключён к общему
+Nginx. Production secrets находятся только в `.env.prod`, шаблон — в
+`.env.prod.example`.
+
+```bash
+cp .env.prod.example .env.prod
+npm run compose:prod:check
+npm run stack:prod:up
+npm run stack:prod:status
+npm run stack:prod:logs
+```
+
+На новом volume таблицы создаются SQL-файлами из `docker/postgres/init`, а
+`TYPEORM_SYNCHRONIZE=false` запрещает автоматическое изменение production-схемы.
+Для обновления уже существующего production volume перед первым развёртыванием
+потребуется отдельная миграция; удалять volume для обновления схемы нельзя.
 
 ## Этап 2: локальная авторизация через Keycloak
 

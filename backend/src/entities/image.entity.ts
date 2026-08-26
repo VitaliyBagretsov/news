@@ -11,9 +11,14 @@ export class Image {
   @Column({ comment: 'Url новости' })
   newsUrl: string;
 
-  @Column({ comment: 'Адрес изображения' })
+  @Column({ type: 'text', nullable: true, comment: 'Адрес изображения' })
   src: string;
 
-  @Column({ comment: 'Подпись изображения' })
+  @Column({
+    type: 'text',
+    nullable: true,
+    default: '',
+    comment: 'Подпись изображения',
+  })
   alt: string;
 }

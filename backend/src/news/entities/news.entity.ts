@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ schema: 'news' })
+@Index(['mediaId', 'externalCode'], { unique: true })
 export class News {
   @PrimaryGeneratedColumn({ comment: 'Внутренний идентрификатор новости' })
   id: number;
@@ -36,14 +37,14 @@ export class News {
   header: string;
 
   @Column({
-    type: 'varchar',
+    type: 'text',
     nullable: true,
     comment: 'Краткий текст новости',
   })
   summary: string;
 
   @Column({
-    type: 'varchar',
+    type: 'text',
     nullable: true,
     comment: 'Подробный текст новости',
   })

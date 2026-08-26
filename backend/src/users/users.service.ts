@@ -5,7 +5,6 @@ import { EntityManager } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
-import { hashPassword } from './utils/index.js';
 import { NotFoundException } from '#exceptions/not-found.exception';
 import { UserExistException } from '#exceptions/user-exist.exception';
 import { EmailUsedException } from '#exceptions/email-used.exception';
@@ -20,15 +19,11 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     await this.checkUserData(createUserDto);
 
-    return hashPassword(createUserDto.password).then((password) => {
-      return this.entityManager
-        .insert(User, { ...createUserDto, password })
-        .then((res) => {
-          return {
-            ...res.identifiers[0],
-            ...createUserDto,
-          } as User;
-        });
+    return this.entityManager.insert(User, createUserDto).then((res) => {
+      return {
+        ...res.identifiers[0],
+        ...createUserDto,
+      } as User;
     });
   }
 
@@ -50,17 +45,9 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.checkUserData(updateUserDto);
 
-    return this.findOne(id).then(() => {
-      if (updateUserDto.password)
-        return hashPassword(updateUserDto.password).then((password) => {
-          return this.entityManager.update(User, id, {
-            ...updateUserDto,
-            password,
-          });
-        });
-
-      return this.entityManager.update(User, id, updateUserDto);
-    });
+    return this.findOne(id).then(() =>
+      this.entityManager.update(User, id, updateUserDto),
+    );
   }
 
   remove(id: string) {
