@@ -17,6 +17,7 @@
     "stack:prod:status": "docker compose --env-file .env.prod -f docker-compose.prod.yml ps",
     "stack:prod:logs": "docker compose --env-file .env.prod -f docker-compose.prod.yml logs -f backend postgres",
     "stack:prod:down": "docker compose --env-file .env.prod -f docker-compose.prod.yml down",
+    "deploy:prod": "bash scripts/deploy-prod.sh",
     "db:up": "docker compose up -d postgres",
     "db:check": "docker compose exec postgres pg_isready -U news_user -d news_db",
     "db:status": "docker compose ps postgres",

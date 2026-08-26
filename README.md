@@ -198,13 +198,11 @@ Keycloak и серверной таблице сессий, а не `news.user`.
 
 ## Подготовка production Compose
 
-`docker-compose.prod.yml` предназначен для будущего запуска backend и PostgreSQL
-на ВМ. PostgreSQL не публикует порт на хост, backend доступен только на
+`docker-compose.prod.yml` предназначен для запуска backend и PostgreSQL на ВМ.
+PostgreSQL не публикует порт на хост, backend доступен только на
 `127.0.0.1:${BACKEND_HOST_PORT}` и в дальнейшем должен быть подключён к общему
 Nginx. Production secrets находятся только в `.env.prod`, шаблон — в
-`.env.prod.example`. Compose использует готовый образ из `NEWS_BACKEND_IMAGE`;
-образ собирается CI либо локально для `linux/amd64` и загружается на ВМ, поэтому
-production-запуск не зависит от доступа ВМ к Docker Hub и npm registry.
+`.env.prod.example`. Compose запускает готовый образ из `NEWS_BACKEND_IMAGE`.
 
 ```bash
 cp .env.prod.example .env.prod
@@ -213,6 +211,34 @@ npm run stack:prod:up
 npm run stack:prod:status
 npm run stack:prod:logs
 ```
+
+### Обновление production на ВМ
+
+После первичной настройки `.env.prod` дальнейшее развёртывание запускается из
+корня клонированного репозитория:
+
+```bash
+cd /opt/news
+./scripts/deploy-prod.sh
+```
+
+Команда `npm run deploy:prod` является эквивалентным сокращением, если npm
+установлен на хосте. Сам скрипт требует только Bash, Git, Docker и `awk`; Node.js
+для работы production-хоста не нужен, поскольку сборка выполняется в Docker.
+
+Скрипт `scripts/deploy-prod.sh`:
+
+1. проверяет наличие `.env.prod`, ветку `main` и отсутствие изменений в
+   отслеживаемых файлах;
+2. выполняет `git pull --ff-only origin main`;
+3. собирает backend на ВМ как `news-backend:<commit SHA>`;
+4. записывает этот тег в `NEWS_BACKEND_IMAGE`, не изменяя остальные секреты;
+5. проверяет Compose, обновляет сервисы и ждёт успешных healthcheck;
+6. при неудачном запуске возвращает предыдущий образ, если он был указан.
+
+Скрипт не удаляет образы и build cache автоматически. Их следует очищать
+отдельно после проверки работающего релиза. PostgreSQL не пересоздаётся, если
+его конфигурация не изменилась, а данные остаются в именованном volume.
 
 На новом volume таблицы создаются SQL-файлами из `docker/postgres/init`, а
 `TYPEORM_SYNCHRONIZE=false` запрещает автоматическое изменение production-схемы.
