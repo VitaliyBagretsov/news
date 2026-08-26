@@ -13,7 +13,7 @@
     "stack:status": "docker compose ps",
     "stack:logs": "docker compose logs -f backend postgres",
     "stack:down": "docker compose down",
-    "stack:prod:up": "docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build",
+    "stack:prod:up": "docker compose --env-file .env.prod -f docker-compose.prod.yml up -d",
     "stack:prod:status": "docker compose --env-file .env.prod -f docker-compose.prod.yml ps",
     "stack:prod:logs": "docker compose --env-file .env.prod -f docker-compose.prod.yml logs -f backend postgres",
     "stack:prod:down": "docker compose --env-file .env.prod -f docker-compose.prod.yml down",

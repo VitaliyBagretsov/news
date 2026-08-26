@@ -202,7 +202,9 @@ Keycloak и серверной таблице сессий, а не `news.user`.
 на ВМ. PostgreSQL не публикует порт на хост, backend доступен только на
 `127.0.0.1:${BACKEND_HOST_PORT}` и в дальнейшем должен быть подключён к общему
 Nginx. Production secrets находятся только в `.env.prod`, шаблон — в
-`.env.prod.example`.
+`.env.prod.example`. Compose использует готовый образ из `NEWS_BACKEND_IMAGE`;
+образ собирается CI либо локально для `linux/amd64` и загружается на ВМ, поэтому
+production-запуск не зависит от доступа ВМ к Docker Hub и npm registry.
 
 ```bash
 cp .env.prod.example .env.prod
@@ -214,6 +216,8 @@ npm run stack:prod:logs
 
 На новом volume таблицы создаются SQL-файлами из `docker/postgres/init`, а
 `TYPEORM_SYNCHRONIZE=false` запрещает автоматическое изменение production-схемы.
+Файл `03-seed-media.sql` добавляет RT непосредственно в `news.media`; далее
+источники управляются только записями этой таблицы.
 Для обновления уже существующего production volume перед первым развёртыванием
 потребуется отдельная миграция; удалять volume для обновления схемы нельзя.
 
