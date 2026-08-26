@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IMedia } from '../../entities/news.entity';
+import { IMedia } from '@/entities';
 
 import style from './style.module.scss';
 

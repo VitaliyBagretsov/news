@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { NewsService } from './news.service';
+import { NewsService } from './news.service.js';
 
-import { CommonService } from '@common/common.service';
-import { News } from './entities/news.entity';
+import { CommonService } from '#common';
+import { News } from './entities/news.entity.js';
 
 @Controller('news')
 export class NewsController {

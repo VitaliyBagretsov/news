@@ -1,18 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthRoleModule } from '@auth/auth-role.module';
-import { CommonService } from '@common/common.service';
+import { AuthModule } from '#auth';
+import { CommonService } from '#common';
 
-import { MediaService } from './media.service';
-import { MediaController } from './media.controller';
-import { Media } from './entities/media.entity';
+import { MediaService } from './media.service.js';
+import { MediaController } from './media.controller.js';
+import { Media } from './entities/media.entity.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Media]), 
-    // AuthRoleModule
-  ],
+  imports: [TypeOrmModule.forFeature([Media]), AuthModule],
   controllers: [MediaController],
   providers: [MediaService, CommonService],
 })

@@ -9,6 +9,6 @@ export interface IQuery<Entity> {
   search?: Partial<Entity>;
   searchBy?: string;
   sort?: Partial<ISort<Entity>>;
-  page?: number,
-  limit?: number,
+  page?: number;
+  limit?: number;
 }

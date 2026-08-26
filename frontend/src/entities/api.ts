@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IMedia, INews, QueryResult } from './types';
-import { IQuery } from '../shared/types';
+import { IQuery } from '@/shared/types';
 
 const parceQuery = (query: IQuery<INews>): string => {
   const result = [
@@ -12,7 +12,7 @@ const parceQuery = (query: IQuery<INews>): string => {
   return result.join('&');
 };
 
-const baseUrl = `${import.meta.env.VITE_API}`
+const baseUrl = `${import.meta.env.VITE_API}`;
 
 // Define a service using a base URL and expected endpoints
 export const newsApi = createApi({

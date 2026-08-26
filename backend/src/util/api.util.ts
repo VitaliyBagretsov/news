@@ -1,13 +1,18 @@
-import fetch from "node-fetch";
+const REQUEST_TIMEOUT_MS = 15_000;
 
-export const getHtmlByFetch = async (url) => {
+export const getHtmlByFetch = async (url: string): Promise<string> => {
   const response = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "text/html",
+      Accept: 'text/html,application/xhtml+xml',
+      'User-Agent': 'news-parser/1.0 (+educational project)',
     },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
-  const html = await response.text();
-  return html;
+  if (!response.ok) {
+    throw new Error(`Request failed with HTTP ${response.status}: ${url}`);
+  }
+
+  return response.text();
 };

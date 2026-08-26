@@ -2,33 +2,42 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TasksService } from '@task.service';
-import { MediaModule } from './media/media.module';
-import { NewsModule } from './news/news.module';
-import { CommonService } from '@common/common.service';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from '#auth';
+import { MediaModule } from '#media';
+import { NewsModule } from '#news';
+import { UsersModule } from '#users';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { TasksService } from './task.service.js';
+
+const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '../.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
+        const synchronize = configService.get<string>('TYPEORM_SYNCHRONIZE');
+
         return {
           type: 'postgres',
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_NAME'),
-          synchronize: true,
-          entities: [__dirname + '*/**/*.entity{.js, .ts}'],
+          host: configService.getOrThrow<string>('POSTGRES_HOST'),
+          port: Number(configService.getOrThrow<string>('POSTGRES_PORT')),
+          username: configService.getOrThrow<string>('POSTGRES_USER'),
+          password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
+          database: configService.getOrThrow<string>('POSTGRES_DB'),
+          synchronize:
+            synchronize === undefined
+              ? process.env.NODE_ENV !== 'production'
+              : synchronize === 'true',
+          entities: [join(moduleDirectory, '**', '*.entity{.js,.ts}')],
         };
       },
       inject: [ConfigService],
@@ -40,6 +49,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TasksService, CommonService],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}

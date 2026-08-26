@@ -2,14 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { hashPassword } from './utils';
-import { NotFoundException } from '@exceptions/not-found.exception';
-import { UserExistException } from '@exceptions/user-exist.exception';
-import { EmailUsedException } from '@exceptions/email-used.exception';
-import { News } from '@news/entities/news.entity';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
+import { User } from './entities/user.entity.js';
+import { NotFoundException } from '#exceptions/not-found.exception';
+import { UserExistException } from '#exceptions/user-exist.exception';
+import { EmailUsedException } from '#exceptions/email-used.exception';
 
 @Injectable()
 export class UsersService {
@@ -21,15 +19,11 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     await this.checkUserData(createUserDto);
 
-    return hashPassword(createUserDto.password).then((password) => {
-      return this.entityManager
-        .insert(User, { ...createUserDto, password })
-        .then((res) => {
-          return {
-            ...res.identifiers[0],
-            ...createUserDto,
-          } as User;
-        });
+    return this.entityManager.insert(User, createUserDto).then((res) => {
+      return {
+        ...res.identifiers[0],
+        ...createUserDto,
+      } as User;
     });
   }
 
@@ -45,23 +39,15 @@ export class UsersService {
   }
 
   findByName(name: string) {
-    return this.entityManager.findOneBy(User, {name});
+    return this.entityManager.findOneBy(User, { name });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.checkUserData(updateUserDto);
 
-    return this.findOne(id).then(() => {
-      if (updateUserDto.password)
-        return hashPassword(updateUserDto.password).then((password) => {
-          return this.entityManager.update(User, id, {
-            ...updateUserDto,
-            password,
-          });
-        });
-
-      return this.entityManager.update(User, id, updateUserDto);
-    });
+    return this.findOne(id).then(() =>
+      this.entityManager.update(User, id, updateUserDto),
+    );
   }
 
   remove(id: string) {

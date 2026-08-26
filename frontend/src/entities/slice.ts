@@ -1,26 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { IMedia } from './types'
+import { createSlice } from '@reduxjs/toolkit';
+import { IMedia } from './types';
 
 export interface NewsState {
-  data: IMedia[]
+  data: IMedia[];
 }
 
 const initialState: NewsState = {
   data: [],
-}
+};
 
 export const newsSlice = createSlice({
   name: 'newsSlice',
   initialState,
   reducers: {
     loadMedia: (state, action) => {
-      return {...state, data: action.payload?.data}
-    }
+      return { ...state, data: action.payload?.data };
+    },
   },
-})
+});
 
-export const {
-  loadMedia
-} = newsSlice.actions;
+export const { loadMedia } = newsSlice.actions;
 
-export default newsSlice.reducer
+export default newsSlice.reducer;

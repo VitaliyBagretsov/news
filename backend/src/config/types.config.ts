@@ -3,7 +3,15 @@ export interface IParseConfig {
   selectors: { [key: string]: string };
   externalCode: (url: string) => string;
   externalId: (url: string) => string;
-  getDate: (element: HTMLElement) => Date
+  getDate: (element: HTMLElement) => Date;
+}
+
+export interface ICollectionResult {
+  source: string;
+  discovered: number;
+  added: number;
+  skipped: number;
+  failed: number;
 }
 
 export interface IListNews {

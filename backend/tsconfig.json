@@ -1,27 +1,27 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "types": ["node", "jest"],
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
     "sourceMap": true,
+    "rootDir": ".",
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
+    "strict": false,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
-    "paths": {
-			"@*": ["src/*"],
-			"src/*": ["src/*"],
-			"fonts/*": ["src/fonts/*"],
-			"components/*": ["src/components/*"]
-		}
+    "esModuleInterop": true
   }
 }

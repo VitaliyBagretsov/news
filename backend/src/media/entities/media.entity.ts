@@ -20,11 +20,11 @@ export class Media {
     comment: 'Описание СМИ',
   })
   description: string;
-  
+
   @Column({
     type: 'varchar',
     length: 500,
-    nullable: true,
+    nullable: false,
     unique: true,
     comment: 'Ссылка на сайт СМИ',
   })
@@ -45,7 +45,7 @@ export class Media {
     comment: 'Контакты СМИ',
   })
   contact: string;
-  
+
   @Column({
     type: 'varchar',
     length: 300,
@@ -64,7 +64,7 @@ export class Media {
 
   @Column({
     type: 'varchar',
-    length: 0,
+    length: 50,
     nullable: true,
     comment: 'Телефон',
   })

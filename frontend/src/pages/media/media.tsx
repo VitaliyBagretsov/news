@@ -1,8 +1,8 @@
-import { IMedia } from '../../entities/news.entity';
+import { IMedia } from '@/entities';
+import MediaItem from '@/features/media-item';
+import { useSelector } from '@/shared/utils/store.util';
 
 import style from './style.module.scss';
-import MediaItem from '../../features/media-item';
-import { useSelector } from '../../shared/utils/store.util';
 
 const getItem = (item: IMedia, index: number) => {
   return (
@@ -23,4 +23,4 @@ export const Media = () => {
   );
 };
 
-export default Media
+export default Media;

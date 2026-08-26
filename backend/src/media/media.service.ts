@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { CreateMediaDto } from './dto/create-media.dto';
-import { UpdateMediaDto } from './dto/update-media.dto';
-import { Media } from './entities/media.entity';
-import { NotFoundException } from '@exceptions/not-found.exception';
+import { CreateMediaDto } from './dto/create-media.dto.js';
+import { UpdateMediaDto } from './dto/update-media.dto.js';
+import { Media } from './entities/media.entity.js';
+import { NotFoundException } from '#exceptions/not-found.exception';
 
 @Injectable()
 export class MediaService {

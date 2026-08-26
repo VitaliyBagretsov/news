@@ -2,16 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 // import { offline } from '@redux-offline/redux-offline'
 // import offlineConfig from '@redux-offline/redux-offline/lib/defaults'
 
-import newsSlice from '../entities/slice';
-import { newsApi } from '../entities/news.entity';
+import { newsApi, newsReducer } from '@/entities';
 
 export const store = configureStore({
   reducer: {
     [newsApi.reducerPath]: newsApi.reducer,
-    newsSlice,
+    newsSlice: newsReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(newsApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(newsApi.middleware),
   // enhancers: (getDefaultEnhancers) =>
   //   getDefaultEnhancers().concat(offline(offlineConfig)),
 });

@@ -1,0 +1,15 @@
+info:
+  name: Get backend session
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{backend_url}}/auth/session"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

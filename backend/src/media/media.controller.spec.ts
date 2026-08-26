@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MediaController } from './media.controller';
-import { MediaService } from './media.service';
+import { RolesGuard, SessionAuthGuard } from '#auth';
+import { CommonService } from '#common';
+import { MediaController } from './media.controller.js';
+import { MediaService } from './media.service.js';
 
 describe('MediaController', () => {
   let controller: MediaController;
@@ -8,8 +10,16 @@ describe('MediaController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MediaController],
-      providers: [MediaService],
-    }).compile();
+      providers: [
+        { provide: MediaService, useValue: {} },
+        { provide: CommonService, useValue: {} },
+      ],
+    })
+      .overrideGuard(SessionAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<MediaController>(MediaController);
   });

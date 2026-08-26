@@ -1,0 +1,21 @@
+opencollection: 1.0.0
+
+info:
+  name: news
+
+request:
+  variables:
+    - name: backend_url
+      value: http://localhost:3000/api
+    - name: username
+      value: "{{process.env.NEWS_USERNAME}}"
+    - name: password
+      value: "{{process.env.NEWS_PASSWORD}}"
+
+bundled: false
+
+extensions:
+  bruno:
+    ignore:
+      - .git
+      - node_modules

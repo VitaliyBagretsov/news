@@ -1,12 +1,11 @@
 import React, { Suspense, useEffect } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import { useDispatch } from '../shared/utils/store.util';
-import { loadMedia } from '../entities/slice';
-import { useGetMediaQuery } from '../entities/news.entity';
+import { loadMedia, useGetMediaQuery } from '@/entities';
+import { useDispatch } from '@/shared/utils/store.util';
 
-const Media = React.lazy(() => import('../pages/media/media'));
-const News = React.lazy(() => import('../pages/news'));
+const Media = React.lazy(() => import('@/pages/media/media'));
+const News = React.lazy(() => import('@/pages/news'));
 
 interface LayoutProps {
   children: JSX.Element;
@@ -22,13 +21,13 @@ function App() {
   useEffect(() => {
     if (isLoading || isFetching) return;
     dispatch(loadMedia(data));
-  }, [data]);
+  }, [data, dispatch, isFetching, isLoading]);
 
   return (
     <HashRouter>
       <Routes>
         <Route
-          path='*'
+          path="*"
           element={
             <Layout>
               <Media />
@@ -36,7 +35,7 @@ function App() {
           }
         />
         <Route
-          path='news/:id'
+          path="news/:id"
           element={
             <Layout>
               <News />

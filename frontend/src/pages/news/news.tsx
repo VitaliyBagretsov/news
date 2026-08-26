@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { List } from 'antd';
 
-import { INews } from '../../entities/types.ts';
-import { useGetNewsQuery } from '../../entities/api.ts';
-import NewsItem from '../../features/news-item/index.tsx';
-import PageToolbar from '../../widgets/page-toolbar.tsx/index.tsx';
-import NewsContent from '../../widgets/news-content/index.tsx';
+import { INews, useGetNewsQuery } from '@/entities';
+import NewsItem from '@/features/news-item';
+import { useSelector } from '@/shared/utils/store.util';
+import NewsContent from '@/widgets/news-content';
+import PageToolbar from '@/widgets/page-toolbar.tsx';
 
 import style from './style.module.scss';
-import { useSelector } from '../../shared/utils/store.util.ts';
 
 const News = () => {
   const params = useParams();
@@ -18,7 +17,7 @@ const News = () => {
   const [limit, setLimit] = useState<number>(10);
 
   const media = useSelector((store) =>
-    store.newsSlice.data.find((item) => item.id.toString() === params.id)
+    store.newsSlice.data.find((item) => item.id.toString() === params.id),
   );
 
   const { data, isLoading, isFetching } = useGetNewsQuery({
@@ -58,9 +57,7 @@ const News = () => {
               dataSource={data?.data}
               renderItem={(item) => (
                 <List.Item>
-                  <List.Item.Meta
-                    title={<NewsItem props={item} onClick={setSelectedNews} />}
-                  />
+                  <List.Item.Meta title={<NewsItem props={item} onClick={setSelectedNews} />} />
                 </List.Item>
               )}
             />
