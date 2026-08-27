@@ -1,13 +1,15 @@
 import { BrowserRouter } from 'react-router-dom';
 
-import { ApiProvider } from './providers';
+import { ApiProvider, AuthRedirectProvider } from './providers';
 import { AppRouter } from './router';
 
 const App = () => {
   return (
     <ApiProvider>
       <BrowserRouter>
-        <AppRouter />
+        <AuthRedirectProvider>
+          <AppRouter />
+        </AuthRedirectProvider>
       </BrowserRouter>
     </ApiProvider>
   );

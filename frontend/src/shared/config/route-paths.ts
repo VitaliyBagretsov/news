@@ -1,5 +1,7 @@
 export const routePaths = {
-  media: '/',
+  home: '/',
+  login: '/login',
+  media: '/media',
   news: '/news/:mediaId',
 } as const;
 

@@ -1,0 +1,25 @@
+.page {
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+  place-items: center;
+  background: #f3f5f7;
+}
+
+.card {
+  width: min(100%, 400px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 8%);
+}
+
+.title,
+.description {
+  text-align: center;
+}
+
+.description {
+  margin-bottom: 24px;
+}
+
+.error {
+  margin-bottom: 20px;
+}
