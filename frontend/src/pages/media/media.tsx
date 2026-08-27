@@ -1,24 +1,24 @@
-import { IMedia } from '@/entities';
+import type { Media as MediaEntity } from '@/entities/media';
+import { useMediaStore } from '@/entities/media';
 import MediaItem from '@/features/media-item';
-import { useSelector } from '@/shared/utils/store.util';
 
 import style from './style.module.scss';
 
-const getItem = (item: IMedia, index: number) => {
+const getItem = (item: MediaEntity) => {
   return (
-    <li className={style.item} key={index}>
+    <li className={style.item} key={item.id}>
       <MediaItem {...item} />
     </li>
   );
 };
 
 export const Media = () => {
-  const data = useSelector((state) => state.newsSlice.data);
+  const media = useMediaStore((state) => state.media);
 
   return (
     <div className={style.page}>
       <h1 className={style.header}>Медиа ресурсы</h1>
-      <ul className={style.media}>{data?.map(getItem)}</ul>
+      <ul className={style.media}>{media.map(getItem)}</ul>
     </div>
   );
 };

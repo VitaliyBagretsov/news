@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { List } from 'antd';
+import { Alert, List, Spin } from 'antd';
 
-import { INews, useGetNewsQuery } from '@/entities';
+import { useMediaStore } from '@/entities/media';
+import type { News as NewsEntity } from '@/entities/news';
+import { useNewsQuery } from '@/entities/news';
 import NewsItem from '@/features/news-item';
-import { useSelector } from '@/shared/utils/store.util';
 import NewsContent from '@/widgets/news-content';
 import PageToolbar from '@/widgets/page-toolbar.tsx';
 
@@ -12,26 +13,22 @@ import style from './style.module.scss';
 
 const News = () => {
   const params = useParams();
-  const [selectedNews, setSelectedNews] = useState<INews | null>(null);
+  const [selectedNews, setSelectedNews] = useState<NewsEntity | null>(null);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
 
-  const media = useSelector((store) =>
-    store.newsSlice.data.find((item) => item.id.toString() === params.id),
+  const media = useMediaStore((state) =>
+    state.media.find((item) => item.id.toString() === params.mediaId),
   );
 
-  const { data, isLoading, isFetching } = useGetNewsQuery({
+  const { data, isError, isPending } = useNewsQuery({
     filter: {
-      id: parseInt(params.id ?? ''),
+      mediaId: Number(params.mediaId),
     },
     sort: { date: 'DESC' },
     page,
     limit,
   });
-
-  useEffect(() => {
-    // console.log(data);
-  }, [data, isLoading, isFetching]);
 
   const onChange = (page: number, pageSize: number) => {
     setPage(page);
@@ -42,7 +39,11 @@ const News = () => {
     <div className={style.media}>
       <PageToolbar header={media?.title ?? ''} logo={media?.logo ?? ''} />
       <div className={style.news}>
-        {isLoading || isFetching ? null : (
+        {isPending ? (
+          <Spin size="large" />
+        ) : isError ? (
+          <Alert message="Не удалось загрузить новости" type="error" />
+        ) : (
           <div>
             <List
               className={style.list}

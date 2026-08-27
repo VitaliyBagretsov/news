@@ -1,5 +1,4 @@
-import { NavBack } from '@/shared/ui/nav-back';
-import { UiTest } from '@/shared/ui/ui-test';
+import { NavBack, UiTest } from '@/shared/ui';
 
 import style from './style.module.scss';
 

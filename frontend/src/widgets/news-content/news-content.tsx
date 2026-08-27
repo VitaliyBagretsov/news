@@ -1,8 +1,8 @@
-import { INews } from '@/entities';
-import { convertTZ } from '@/shared/utils/parse.util';
+import type { News } from '@/entities/news';
+import { convertTZ } from '@/shared/utils';
 import style from './style.module.scss';
 
-const NewsContent = (props: INews) => {
+const NewsContent = (props: News) => {
   return (
     <div className={style.content}>
       <div className={style.sticky}>

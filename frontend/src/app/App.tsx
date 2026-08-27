@@ -1,50 +1,16 @@
-import React, { Suspense, useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
-import { loadMedia, useGetMediaQuery } from '@/entities';
-import { useDispatch } from '@/shared/utils/store.util';
+import { BrowserRouter } from 'react-router-dom';
 
-const Media = React.lazy(() => import('@/pages/media/media'));
-const News = React.lazy(() => import('@/pages/news'));
+import { ApiProvider } from './providers';
+import { AppRouter } from './router';
 
-interface LayoutProps {
-  children: JSX.Element;
-}
-
-const Layout = ({ children }: LayoutProps) => {
-  return <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>;
-};
-function App() {
-  const dispatch = useDispatch();
-  const { data, isLoading, isFetching } = useGetMediaQuery();
-
-  useEffect(() => {
-    if (isLoading || isFetching) return;
-    dispatch(loadMedia(data));
-  }, [data, dispatch, isFetching, isLoading]);
-
+const App = () => {
   return (
-    <HashRouter>
-      <Routes>
-        <Route
-          path="*"
-          element={
-            <Layout>
-              <Media />
-            </Layout>
-          }
-        />
-        <Route
-          path="news/:id"
-          element={
-            <Layout>
-              <News />
-            </Layout>
-          }
-        />
-      </Routes>
-    </HashRouter>
+    <ApiProvider>
+      <BrowserRouter>
+        <AppRouter />
+      </BrowserRouter>
+    </ApiProvider>
   );
-}
+};
 
 export default App;

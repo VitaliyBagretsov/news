@@ -1,12 +1,12 @@
 import { MouseEventHandler } from 'react';
-import { INews } from '@/entities';
-import { convertTZ } from '@/shared/utils/parse.util';
+import type { News } from '@/entities/news';
+import { convertTZ } from '@/shared/utils';
 
 import style from './style.module.scss';
 
 interface IProps {
-  props: INews;
-  onClick: (arg: INews) => void;
+  props: News;
+  onClick: (arg: News) => void;
 }
 
 const NewsItem = ({ props, onClick }: IProps) => {
