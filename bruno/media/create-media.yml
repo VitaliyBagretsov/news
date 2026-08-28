@@ -1,0 +1,31 @@
+info:
+  name: Create media
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{backend_url}}/media"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Example media",
+        "description": "Example media description",
+        "url": "https://example.com",
+        "copyright": "Example Media",
+        "contact": "Editorial office",
+        "chiefEditor": "Editor Name",
+        "address": "Moscow",
+        "phone": "+7 999 000-00-00",
+        "email": "editor@example.com",
+        "isActive": true,
+        "logo": "https://example.com/logo.png"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

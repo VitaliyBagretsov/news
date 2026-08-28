@@ -1,0 +1,15 @@
+info:
+  name: Get all media
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{backend_url}}/media/all"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

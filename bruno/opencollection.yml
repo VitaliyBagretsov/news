@@ -6,11 +6,13 @@ info:
 request:
   variables:
     - name: backend_url
-      value: http://localhost:3000/api
+      value: "http://localhost:{{process.env.BACKEND_PORT}}/api"
     - name: username
       value: "{{process.env.NEWS_USERNAME}}"
     - name: password
       value: "{{process.env.NEWS_PASSWORD}}"
+    - name: media_id
+      value: "1"
 
 bundled: false
 

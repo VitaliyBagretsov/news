@@ -11,6 +11,7 @@ import { NewsModule } from '#news';
 import { UsersModule } from '#users';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import configuration from './config/configuration.js';
 import { TasksService } from './task.service.js';
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,7 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '../.env',
+      load: [configuration],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

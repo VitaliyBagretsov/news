@@ -32,21 +32,26 @@ export class MediaController {
   }
 
   @UseGuards(SessionAuthGuard, RolesGuard)
-  @Roles('user')
+  @Roles('user', 'admin')
   @Get()
-  find(@Query() query: Record<string, unknown>) {
-    return this.commonService.getData<Media>('media', query);
+  async find(@Query() query: Record<string, unknown>) {
+    const result = await this.commonService.getData<Media>('media', query);
+
+    return {
+      ...result,
+      data: await this.mediaService.addStatistics(result.data),
+    };
   }
 
-  // @UseGuards(SessionAuthGuard, RolesGuard)
-  // @Roles('user')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles('user', 'admin')
   @Get('all')
   findAll() {
     return this.mediaService.findAll();
   }
 
-  // @UseGuards(SessionAuthGuard, RolesGuard)
-  // @Roles('user')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles('user', 'admin')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.mediaService.findOne(+id);

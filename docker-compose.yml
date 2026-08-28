@@ -31,11 +31,12 @@ services:
     env_file:
       - ${NEWS_ENV_FILE:-./.env}
     environment:
+      BACKEND_PORT: ${BACKEND_PORT:?BACKEND_PORT must be set}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       TYPEORM_SYNCHRONIZE: ${TYPEORM_SYNCHRONIZE:-true}
     ports:
-      - "${BACKEND_HOST_PORT:-3000}:3000"
+      - "${BACKEND_PORT:?BACKEND_PORT must be set}:${BACKEND_PORT:?BACKEND_PORT must be set}"
     networks:
       - news_network
     depends_on:
@@ -45,7 +46,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget --quiet --output-document=- http://127.0.0.1:3000/api/health >/dev/null",
+          "wget --quiet --output-document=- http://127.0.0.1:$${BACKEND_PORT}/api/health >/dev/null",
         ]
       interval: 10s
       timeout: 5s

@@ -10,7 +10,7 @@ readonly EXPECTED_BRANCH="main"
 
 cd "${PROJECT_DIR}"
 
-for command in git docker awk mktemp; do
+for command in git docker awk grep mktemp; do
   if ! command -v "${command}" >/dev/null 2>&1; then
     echo "Required command is not installed: ${command}" >&2
     exit 1
@@ -19,6 +19,11 @@ done
 
 if [[ ! -f "${ENV_FILE}" ]]; then
   echo "Missing ${ENV_FILE}. Create it from .env.prod.example first." >&2
+  exit 1
+fi
+
+if ! grep -q '^BACKEND_PORT=' "${ENV_FILE}"; then
+  echo "BACKEND_PORT is missing from ${ENV_FILE}." >&2
   exit 1
 fi
 
@@ -97,4 +102,3 @@ docker compose \
   --env-file "${ENV_FILE}" \
   -f "${COMPOSE_FILE}" \
   ps
-
