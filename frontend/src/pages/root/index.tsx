@@ -2,6 +2,8 @@ import { Layout, Menu, Typography } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/shared/config';
+import LogOut from '@/features/log-out';
+import UserInfo from '@/features/user-info';
 
 import style from './style.module.scss';
 
@@ -29,6 +31,10 @@ const RootPage = () => {
           selectedKeys={selectedPath ? [selectedPath] : []}
           theme="dark"
         />
+        <div className={style.userActions}>
+          <UserInfo />
+          <LogOut />
+        </div>
       </Layout.Header>
       <Layout.Content className={style.content}>
         <Outlet />
