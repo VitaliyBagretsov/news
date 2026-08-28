@@ -1,0 +1,15 @@
+info:
+  name: Delete media
+  type: http
+  seq: 6
+
+http:
+  method: DELETE
+  url: "{{backend_url}}/media/{{media_id}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

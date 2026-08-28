@@ -1,0 +1,30 @@
+.widget {
+  margin: 50px auto;
+  max-inline-size: 1440px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-block-end: 50px;
+}
+
+.header {
+  margin: 0;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
+  justify-content: center;
+  list-style: none;
+  gap: 24px;
+}
+
+.item {
+  width: 100%;
+  max-width: 360px;
+  min-height: 290px;
+}

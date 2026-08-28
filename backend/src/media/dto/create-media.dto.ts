@@ -1,33 +1,50 @@
-import { IsBoolean, IsEmail, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateMediaDto {
   @IsString()
   title: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
-  @IsString()
+  @IsUrl()
   url: string;
 
+  @IsOptional()
   @IsString()
-  copyright: string;
+  copyright?: string;
 
+  @IsOptional()
   @IsString()
-  contact: string;
+  contact?: string;
 
+  @IsOptional()
   @IsString()
-  chiefEditor: string;
+  chiefEditor?: string;
 
+  @IsOptional()
   @IsString()
-  address: string;
+  address?: string;
 
+  @IsOptional()
   @IsString()
-  phone: string;
+  phone?: string;
 
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsBoolean()
   isActive: boolean;
+
+  @IsOptional()
+  @IsUrl()
+  logo?: string;
 }
