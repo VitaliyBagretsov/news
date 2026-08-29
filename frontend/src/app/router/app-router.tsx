@@ -10,6 +10,7 @@ const HomePage = lazy(() => import('@/pages/home'));
 const LoginPage = lazy(() => import('@/pages/login'));
 const MediaPage = lazy(() => import('@/pages/media'));
 const NewsPage = lazy(() => import('@/pages/news'));
+const ParserConfigPage = lazy(() => import('@/pages/parser-config'));
 const NotFoundPage = lazy(() => import('@/pages/not-found'));
 const RootPage = lazy(() => import('@/pages/root'));
 
@@ -22,6 +23,7 @@ export const AppRouter = () => (
           <Route index element={<HomePage />} />
           <Route path={routePaths.media} element={<MediaPage />} />
           <Route path={routePaths.news} element={<NewsPage />} />
+          <Route path={routePaths.parserConfig} element={<ParserConfigPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>

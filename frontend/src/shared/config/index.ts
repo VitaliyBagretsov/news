@@ -1,1 +1,1 @@
-export { createNewsPath, routePaths } from './route-paths';
+export { createNewsPath, createParserConfigPath, routePaths } from './route-paths';

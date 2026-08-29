@@ -25,6 +25,7 @@
     "db:stop": "docker compose stop postgres",
     "db:down": "docker compose down",
     "db:psql": "docker compose exec postgres psql -U news_user -d news_db",
+    "db:migrate": "bash scripts/apply-db-schema.sh",
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
     "format:check": "npm --prefix backend run format:check && npm --prefix frontend run format:check",
     "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck",

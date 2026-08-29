@@ -1,0 +1,15 @@
+info:
+  name: Get parser config
+  type: http
+  seq: 10
+
+http:
+  method: GET
+  url: "{{backend_url}}/media/{{media_id}}/parser-config"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -8,9 +8,9 @@ import { fileURLToPath } from 'node:url';
 import { AuthModule } from '#auth';
 import { MediaModule } from '#media';
 import { NewsModule } from '#news';
+import { NewsCollectorModule } from '#news-collector';
 import { UsersModule } from '#users';
 import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
 import configuration from './config/configuration.js';
 import { TasksService } from './task.service.js';
 
@@ -49,8 +49,9 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
     NewsModule,
     UsersModule,
     AuthModule,
+    NewsCollectorModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TasksService],
+  providers: [TasksService],
 })
 export class AppModule {}

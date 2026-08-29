@@ -5,6 +5,7 @@ import type { MediaListItem } from '@/entities/media';
 import { MediaCard, useMediaQuery, useMediaStore } from '@/entities/media';
 import CreateMediaFeature from '@/features/create-media';
 import OpenMediaNews from '@/features/open-media-news';
+import OpenParserConfig from '@/features/open-parser-config';
 import UpdateMediaFeature from '@/features/update-media';
 import UpdateMediaLogo from '@/features/update-media-logo';
 
@@ -33,6 +34,7 @@ const MediaList = () => {
         actions={
           <>
             <UpdateMediaFeature media={item} />
+            <OpenParserConfig mediaId={item.id} />
             <OpenMediaNews mediaId={item.id} />
           </>
         }

@@ -116,6 +116,9 @@ docker compose \
   -f "${COMPOSE_FILE}" \
   config --quiet
 
+echo "Applying database schema changes..."
+"${SCRIPT_DIR}/apply-db-schema.sh" "${ENV_FILE}" "${COMPOSE_FILE}"
+
 echo "Starting production services and waiting for healthchecks..."
 if ! docker compose \
   --env-file "${ENV_FILE}" \

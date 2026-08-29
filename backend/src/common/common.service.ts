@@ -4,8 +4,8 @@ import { DataSource } from 'typeorm';
 
 import { ENTITY_LIST } from '../constants/news.const.js';
 import { QueryDto } from '../dto/query.dto.js';
-import { IResponseData } from '../types/index.js';
-import { prepareQuery } from '../util/parse.util.js';
+import type { IResponseData } from './types/index.js';
+import { prepareQuery } from './utils/index.js';
 
 @Injectable()
 export class CommonService {

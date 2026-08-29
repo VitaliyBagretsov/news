@@ -1,0 +1,31 @@
+.page {
+  width: min(1200px, calc(100% - 32px));
+  margin: 40px auto;
+}
+
+.notice,
+.preview {
+  margin-block-end: 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-block-start: 24px;
+}
+
+.preview {
+  margin-block-start: 24px;
+
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 16px;
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}

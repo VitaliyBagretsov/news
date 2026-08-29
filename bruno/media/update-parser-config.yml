@@ -1,0 +1,32 @@
+info:
+  name: Update parser config
+  type: http
+  seq: 11
+
+http:
+  method: PUT
+  url: "{{backend_url}}/media/{{media_id}}/parser-config"
+  body:
+    type: json
+    data: |-
+      {
+        "articleLinkSelector": ".listing__column_main-news a",
+        "headerSelector": ".article>.article__heading",
+        "dateSelector": ".article time",
+        "summarySelector": ".article>.article__summary",
+        "textSelector": ".article>.article__text>p",
+        "linkSelector": ".article__text a",
+        "imageSelector": ".article img",
+        "externalCodeStrategy": "last-path-segment",
+        "externalIdStrategy": "code-prefix",
+        "publicationDateStrategy": "datetime-attribute",
+        "sameHostOnly": true,
+        "excludedUrlPatterns": ["cnComments"]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

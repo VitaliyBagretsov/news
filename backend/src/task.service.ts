@@ -1,11 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-
-import { AppService } from './app.service.js';
-import { Media } from './media/entities/index.js';
+import { NewsCollectorService } from '#news-collector';
 
 @Injectable()
 export class TasksService implements OnApplicationBootstrap {
@@ -13,10 +9,8 @@ export class TasksService implements OnApplicationBootstrap {
   private collectionIsRunning = false;
 
   constructor(
-    private readonly appService: AppService,
+    private readonly newsCollectorService: NewsCollectorService,
     private readonly configService: ConfigService,
-    @InjectEntityManager()
-    private readonly entityManager: EntityManager,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -44,23 +38,8 @@ export class TasksService implements OnApplicationBootstrap {
     this.collectionIsRunning = true;
 
     try {
-      const mediaList = await this.entityManager.findBy(Media, {
-        isActive: true,
-      });
-
-      this.logger.log(
-        `Starting ${trigger} collection for ${mediaList.length} source(s)`,
-      );
-
-      for (const media of mediaList) {
-        try {
-          await this.appService.writeNews(media.url, media.id);
-        } catch (error) {
-          this.logger.error(
-            `Source collection failed for ${media.url}: ${String(error)}`,
-          );
-        }
-      }
+      this.logger.log(`Starting ${trigger} collection`);
+      await this.newsCollectorService.collectActiveMedia();
     } finally {
       this.collectionIsRunning = false;
     }

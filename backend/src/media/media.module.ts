@@ -4,10 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '#auth';
 import { CommonService } from '#common';
 
-import { MediaService } from './media.service.js';
-import { MediaController } from './media.controller.js';
+import { MediaController } from './controllers/index.js';
 import { Media } from './entities/media.entity.js';
-import { MediaImagesService } from './media-images.service.js';
+import { MediaImagesService, MediaService } from './services/index.js';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Media]), AuthModule],
