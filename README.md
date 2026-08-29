@@ -300,6 +300,37 @@ npm run stack:prod:logs
 Keycloak/Nginx нужен только при изменении realm, клиента, сертификатов, общей
 Docker-сети или публичных маршрутов `/keycloak/`, `/news/` и `/news/api/`.
 
+### Автоматический deployment из GitHub
+
+Workflow `.github/workflows/deploy-production.yml` запускается после каждого
+push в `main`, включая merge pull request, а также вручную через вкладку
+`Actions`. Он подключается к ВМ по SSH и запускает тот же
+`scripts/deploy-prod.sh`, который используется при ручном релизе. Одновременно
+может выполняться только один production deployment.
+
+В `Settings` → `Secrets and variables` → `Actions` → `Repository secrets`
+необходимо создать:
+
+- `PROD_HOST` — `158.160.205.151`;
+- `PROD_USER` — `vitaliy`;
+- `PROD_SSH_PRIVATE_KEY` — закрытый ключ отдельной пары, предназначенной только
+  для GitHub Actions;
+- `PROD_SSH_KNOWN_HOSTS` — доверенная строка host key production-ВМ.
+
+Закрытый ключ не хранится в репозитории и не должен совпадать с личным SSH-ключом
+разработчика. Соответствующий публичный ключ добавляется на ВМ отдельной строкой
+в `/home/vitaliy/.ssh/authorized_keys`. Для этого ключа рекомендуется указать
+`restrict` и принудительную команду `/opt/news/scripts/deploy-prod.sh`: тогда
+ключ нельзя использовать как обычный интерактивный доступ к ВМ. Перед
+сохранением `PROD_SSH_KNOWN_HOSTS` fingerprint host key следует сверить через
+уже доверенное SSH-подключение.
+
+Workflow не передаёт `.env.prod` или секреты приложения: они остаются только на
+ВМ. При использовании принудительной команды GitHub получает лишь доступ к
+запуску deployment-процесса News.
+При ошибке job становится красным, а подробный журнал доступен во вкладке
+`Actions`; встроенный rollback `deploy-prod.sh` продолжает действовать.
+
 ### Обновление production на ВМ
 
 После первичной настройки `.env.prod` дальнейшее развёртывание запускается из

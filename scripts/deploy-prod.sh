@@ -42,7 +42,14 @@ if [[ -n "$(git status --short --untracked-files=no)" ]]; then
 fi
 
 echo "Updating ${EXPECTED_BRANCH} from origin..."
+revision_before_pull="$(git rev-parse HEAD)"
 git pull --ff-only origin "${EXPECTED_BRANCH}"
+revision_after_pull="$(git rev-parse HEAD)"
+
+if [[ "${revision_before_pull}" != "${revision_after_pull}" ]]; then
+  echo "Repository was updated; restarting the current deployment script..."
+  exec "${BASH_SOURCE[0]}"
+fi
 
 commit_sha="$(git rev-parse --short=12 HEAD)"
 backend_image="news-backend:${commit_sha}"
