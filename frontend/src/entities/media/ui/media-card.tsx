@@ -1,11 +1,13 @@
-import type { ReactNode, SyntheticEvent } from 'react';
+import type { ReactNode } from 'react';
 
 import type { MediaListItem } from '../model';
 
 import style from './media-card.module.scss';
+import { MediaLogo } from './media-logo';
 
 interface MediaCardProps {
   actions?: ReactNode;
+  logoAction?: ReactNode;
   media: MediaListItem;
 }
 
@@ -17,23 +19,14 @@ const formatLastPublishedAt = (value: string | null): string =>
       })
     : 'Нет публикаций';
 
-export const MediaCard = ({ actions, media }: MediaCardProps) => {
-  const logo = media.logo || '/media.png';
-
-  const handleLogoError = (event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.onerror = null;
-    event.currentTarget.src = '/media.png';
-  };
-
+export const MediaCard = ({ actions, logoAction, media }: MediaCardProps) => {
   return (
     <article className={style.card}>
       <div className={style.content}>
-        <img
-          alt={`${media.title} logo`}
-          className={style.logo}
-          onError={handleLogoError}
-          src={logo}
-        />
+        <div className={style.logoContainer}>
+          <MediaLogo className={style.logo} fileName={media.logo} title={media.title} />
+          {logoAction}
+        </div>
         <span className={style.title}>{media.title}</span>
       </div>
 

@@ -91,5 +91,5 @@ export class Media {
     nullable: true,
     comment: 'Ссылка на логотип',
   })
-  logo: string;
+  logo: string | null;
 }

@@ -23,6 +23,8 @@ lerna-debug.log*
 # Tests
 /coverage
 /.nyc_output
+/backend/public/images/*
+!/backend/public/images/.gitkeep
 
 # IDEs and editors
 /.idea

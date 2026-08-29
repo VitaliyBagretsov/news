@@ -1,25 +1,46 @@
 import { jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getEntityManagerToken } from '@nestjs/typeorm';
-import type { Media } from './entities/media.entity.js';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Media } from './entities/media.entity.js';
+import type { MediaStatisticsRow } from './media.types.js';
 import { MediaService } from './media.service.js';
+import { MediaImagesService } from './media-images.service.js';
 
 describe('MediaService', () => {
   let service: MediaService;
-  const entityManager = {
+  const getRawMany = jest.fn<() => Promise<MediaStatisticsRow[]>>();
+  const queryBuilder = {
+    addSelect: jest.fn().mockReturnThis(),
+    getRawMany,
+    groupBy: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+  };
+  const mediaRepository = {
+    createQueryBuilder: jest.fn(() => queryBuilder),
+    find: jest.fn<() => Promise<Media[]>>(),
     findOneBy: jest.fn<() => Promise<unknown>>(),
-    query: jest.fn<() => Promise<unknown>>(),
     save: jest.fn<() => Promise<unknown>>(),
+    remove: jest.fn<() => Promise<unknown>>(),
+  };
+  const mediaImagesService = {
+    remove: jest.fn<() => Promise<void>>(),
+    save: jest.fn<() => Promise<string>>(),
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MediaService,
         {
-          provide: getEntityManagerToken(),
-          useValue: entityManager,
+          provide: getRepositoryToken(Media),
+          useValue: mediaRepository,
         },
+        { provide: MediaImagesService, useValue: mediaImagesService },
       ],
     }).compile();
 
@@ -37,13 +58,10 @@ describe('MediaService', () => {
       isActive: true,
     };
     const createdMedia = { id: 1, ...createMediaDto };
-    entityManager.save.mockResolvedValue(createdMedia);
+    mediaRepository.save.mockResolvedValue(createdMedia);
 
     await expect(service.create(createMediaDto)).resolves.toEqual(createdMedia);
-    expect(entityManager.save).toHaveBeenCalledWith(
-      expect.any(Function),
-      createMediaDto,
-    );
+    expect(mediaRepository.save).toHaveBeenCalledWith(createMediaDto);
   });
 
   it('returns the updated media', async () => {
@@ -55,20 +73,17 @@ describe('MediaService', () => {
     };
     const changes = { title: 'Updated media' };
     const updatedMedia = { ...media, ...changes };
-    entityManager.findOneBy.mockResolvedValue(media);
-    entityManager.save.mockResolvedValue(updatedMedia);
+    mediaRepository.findOneBy.mockResolvedValue(media);
+    mediaRepository.save.mockResolvedValue(updatedMedia);
 
     await expect(service.update(media.id, changes)).resolves.toEqual(
       updatedMedia,
     );
-    expect(entityManager.save).toHaveBeenCalledWith(
-      expect.any(Function),
-      updatedMedia,
-    );
+    expect(mediaRepository.save).toHaveBeenCalledWith(updatedMedia);
   });
 
   it('normalizes aggregated media statistics', async () => {
-    entityManager.query.mockResolvedValue([
+    getRawMany.mockResolvedValue([
       {
         mediaId: '1',
         newsCount: '12',
@@ -83,7 +98,7 @@ describe('MediaService', () => {
       },
     ]);
 
-    await expect(service.findStatistics()).resolves.toEqual([
+    await expect(service.findStatistics([1, 2])).resolves.toEqual([
       {
         mediaId: 1,
         newsCount: 12,
@@ -97,6 +112,15 @@ describe('MediaService', () => {
         lastPublishedAt: null,
       },
     ]);
+    expect(queryBuilder.where).toHaveBeenCalledWith(
+      'media.id IN (:...mediaIds)',
+      { mediaIds: [1, 2] },
+    );
+    expect(queryBuilder.leftJoin).toHaveBeenCalledWith(
+      expect.any(Function),
+      'news',
+      'news.mediaId = media.id',
+    );
   });
 
   it('adds statistics to media list items', async () => {
@@ -104,7 +128,7 @@ describe('MediaService', () => {
       { id: 1, title: 'First media' },
       { id: 2, title: 'Second media' },
     ] as Media[];
-    entityManager.query.mockResolvedValue([
+    getRawMany.mockResolvedValue([
       {
         mediaId: 1,
         newsCount: 12,
@@ -129,5 +153,29 @@ describe('MediaService', () => {
         lastPublishedAt: null,
       },
     ]);
+  });
+
+  it('does not query statistics for an empty media list', async () => {
+    await expect(service.addStatistics([])).resolves.toEqual([]);
+    expect(mediaRepository.createQueryBuilder).not.toHaveBeenCalled();
+  });
+
+  it('stores a new logo file name and removes the previous file', async () => {
+    const media = { id: 1, title: 'Media', logo: '1-old.png' } as Media;
+    const file = {
+      buffer: Buffer.from('image'),
+      mimetype: 'image/png',
+      originalname: 'logo.png',
+      size: 5,
+    };
+    mediaRepository.findOneBy.mockResolvedValue(media);
+    mediaImagesService.save.mockResolvedValue('1-new.png');
+    mediaRepository.save.mockResolvedValue({ ...media, logo: '1-new.png' });
+
+    await expect(service.updateLogo(media.id, file)).resolves.toEqual({
+      ...media,
+      logo: '1-new.png',
+    });
+    expect(mediaImagesService.remove).toHaveBeenCalledWith('1-old.png');
   });
 });

@@ -26,6 +26,10 @@
       "types": "./src/news/index.ts",
       "default": "./dist/news/index.js"
     },
+    "#news/entities": {
+      "types": "./src/news/entities/index.ts",
+      "default": "./dist/news/entities/index.js"
+    },
     "#users": {
       "types": "./src/users/index.ts",
       "default": "./dist/users/index.js"
@@ -117,6 +121,7 @@
       "^(\\.{1,2}/.*)\\.js$": "$1",
       "^#auth$": "<rootDir>/auth/index",
       "^#(common|media|news|users)$": "<rootDir>/$1/index",
+      "^#news/entities$": "<rootDir>/news/entities/index",
       "^#exceptions/(.*)$": "<rootDir>/exceptions/$1"
     },
     "extensionsToTreatAsEsm": [

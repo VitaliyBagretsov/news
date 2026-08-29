@@ -3,6 +3,7 @@ import { RolesGuard, SessionAuthGuard } from '#auth';
 import { CommonService } from '#common';
 import { MediaController } from './media.controller.js';
 import { MediaService } from './media.service.js';
+import { MediaImagesService } from './media-images.service.js';
 
 describe('MediaController', () => {
   let controller: MediaController;
@@ -13,6 +14,7 @@ describe('MediaController', () => {
       providers: [
         { provide: MediaService, useValue: {} },
         { provide: CommonService, useValue: {} },
+        { provide: MediaImagesService, useValue: {} },
       ],
     })
       .overrideGuard(SessionAuthGuard)

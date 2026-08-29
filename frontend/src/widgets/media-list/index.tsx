@@ -6,6 +6,7 @@ import { MediaCard, useMediaQuery, useMediaStore } from '@/entities/media';
 import CreateMediaFeature from '@/features/create-media';
 import OpenMediaNews from '@/features/open-media-news';
 import UpdateMediaFeature from '@/features/update-media';
+import UpdateMediaLogo from '@/features/update-media-logo';
 
 import style from './style.module.scss';
 
@@ -35,6 +36,7 @@ const MediaList = () => {
             <OpenMediaNews mediaId={item.id} />
           </>
         }
+        logoAction={<UpdateMediaLogo media={item} />}
         media={item}
       />
     </li>

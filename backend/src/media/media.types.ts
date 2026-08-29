@@ -14,7 +14,7 @@ export interface MediaListItem extends Media {
 }
 
 export interface MediaStatisticsRow {
-  mediaId: number;
+  mediaId: number | string;
   newsCount: number | string;
   publicationsLast24Hours: number | string;
   lastPublishedAt: Date | string | null;

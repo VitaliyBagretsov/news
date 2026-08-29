@@ -1,5 +1,4 @@
-import type { SyntheticEvent } from 'react';
-
+import { MediaLogo } from '@/entities/media';
 import { NavBack, UiTest } from '@/shared/ui';
 
 import style from './style.module.scss';
@@ -10,22 +9,12 @@ interface IPageToolbarProps {
 }
 
 const PageToolbar = (props: IPageToolbarProps) => {
-  const handleLogoError = (event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.onerror = null;
-    event.currentTarget.src = '/media.png';
-  };
-
   return (
     <div className={style.toolbar}>
       <div className={style.toolbarLeft}>
         <NavBack />
       </div>
-      <img
-        alt={`${props.header} logo`}
-        className={style.logo}
-        onError={handleLogoError}
-        src={props.logo || '/media.png'}
-      />
+      <MediaLogo className={style.logo} fileName={props.logo} title={props.header} />
       <h2 className={style.toolbarCentral}>{props.header}</h2>
       <div className={style.toolbarRight}>
         <UiTest />

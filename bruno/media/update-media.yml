@@ -19,8 +19,7 @@ http:
         "address": "Moscow",
         "phone": "+7 999 000-00-00",
         "email": "editor@example.com",
-        "isActive": true,
-        "logo": "https://example.com/logo.png"
+        "isActive": true
       }
   auth: inherit
 
