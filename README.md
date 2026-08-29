@@ -233,6 +233,104 @@ npm run stack:prod:status
 npm run stack:prod:logs
 ```
 
+### Последовательность доработки и выпуска
+
+Обычный цикл разработки и доставки изменений выполняется небольшими этапами.
+
+1. Перед началом работы обновить локальный `main` и создать тематическую ветку:
+
+   ```bash
+   git switch main
+   git pull --ff-only origin main
+   git switch -c feature/short-description
+   ```
+
+2. Доработать backend или frontend и сначала проверить результат без Docker.
+   Для полного набора локальных проверок из корня репозитория выполнить:
+
+   ```bash
+   npm run format:check
+   npm run typecheck
+   npm run lint
+   npm test
+   ```
+
+3. Проверить контейнерный запуск локально. При обычной разработке `.env`
+   содержит `BACKEND_PORT=3000`; если backend одновременно запускается напрямую,
+   значение временно меняется на `3001`:
+
+   ```bash
+   npm run compose:check
+   npm run stack:up
+   npm run stack:status
+   ```
+
+4. Проверить основные пользовательские сценарии через браузер или коллекцию
+   Bruno: вход, session, чтение media и news, а для роли `admin` — изменение
+   media. После проверки создать commit, отправить ветку и слить pull request в
+   `main`. Прямое развёртывание feature-ветки на production не выполняется.
+
+5. Если меняется схема или справочные данные PostgreSQL, до релиза подготовить
+   отдельный идемпотентный SQL-файл миграции и сделать backup production-базы.
+   Файлы `docker-entrypoint-initdb.d` не выполняются повторно на существующем
+   volume, а `TYPEORM_SYNCHRONIZE` в production всегда остаётся `false`.
+
+6. После слияния подключиться к ВМ и запустить единый скрипт релиза:
+
+   ```bash
+   ssh vitaliy@158.160.205.151
+   cd /opt/news
+   ./scripts/deploy-prod.sh
+   ```
+
+7. Проверить контейнеры, внутренние healthcheck и публичные HTTPS-маршруты:
+
+   ```bash
+   docker compose --env-file .env.prod -f docker-compose.prod.yml ps
+   curl -fsS http://127.0.0.1:3000/api/health
+   curl -fsS https://vitaliy-vm.duckdns.org/news/api/health
+   curl -I https://vitaliy-vm.duckdns.org/news/
+   ```
+
+8. Выполнить короткий production smoke-test в браузере. Только после него можно
+   удалить заведомо неактуальные образы и build cache. Именованный PostgreSQL
+   volume при очистке Docker не удалять.
+
+Обычный релиз News не требует обновлять `keycloak-project`. Отдельный релиз
+Keycloak/Nginx нужен только при изменении realm, клиента, сертификатов, общей
+Docker-сети или публичных маршрутов `/keycloak/`, `/news/` и `/news/api/`.
+
+### Автоматический deployment из GitHub
+
+Workflow `.github/workflows/deploy-production.yml` запускается после каждого
+push в `main`, включая merge pull request, а также вручную через вкладку
+`Actions`. Он подключается к ВМ по SSH и запускает тот же
+`scripts/deploy-prod.sh`, который используется при ручном релизе. Одновременно
+может выполняться только один production deployment.
+
+В `Settings` → `Secrets and variables` → `Actions` → `Repository secrets`
+необходимо создать:
+
+- `PROD_HOST` — `158.160.205.151`;
+- `PROD_USER` — `vitaliy`;
+- `PROD_SSH_PRIVATE_KEY` — закрытый ключ отдельной пары, предназначенной только
+  для GitHub Actions;
+- `PROD_SSH_KNOWN_HOSTS` — доверенная строка host key production-ВМ.
+
+Закрытый ключ не хранится в репозитории и не должен совпадать с личным SSH-ключом
+разработчика. Соответствующий публичный ключ добавляется на ВМ отдельной строкой
+в `/home/vitaliy/.ssh/authorized_keys`. Для этого ключа рекомендуется указать
+`restrict` и принудительную команду `/opt/news/scripts/deploy-prod.sh`: тогда
+ключ нельзя использовать как обычный интерактивный доступ к ВМ. Перед
+сохранением `PROD_SSH_KNOWN_HOSTS` fingerprint host key следует сверить через
+уже доверенное SSH-подключение.
+
+Workflow не передаёт `.env.prod` или секреты приложения: они остаются только на
+ВМ. При использовании принудительной команды GitHub получает лишь доступ к
+запуску deployment-процесса News.
+При ошибке job становится красным, а подробный журнал доступен во вкладке
+`Actions`; встроенный rollback `deploy-prod.sh` продолжает действовать.
+
 ### Обновление production на ВМ
 
 После первичной настройки `.env.prod` дальнейшее развёртывание запускается из
@@ -262,6 +360,16 @@ cd /opt/news
 Скрипт не удаляет образы и build cache автоматически. Их следует очищать
 отдельно после проверки работающего релиза. PostgreSQL не пересоздаётся, если
 его конфигурация не изменилась, а данные остаются в именованном volume.
+
+Если новый контейнер не проходит healthcheck, скрипт пытается восстановить
+предыдущие теги образов автоматически. Для ручной диагностики используются:
+
+```bash
+docker logs --tail 100 news-backend
+docker logs --tail 100 news-frontend
+docker logs --since 30m keycloak-proxy 2>&1 |
+  awk '$7 ~ /^\/news\/api\// && $9 >= 400'
+```
 
 На новом volume таблицы создаются SQL-файлами из `docker/postgres/init`, а
 `TYPEORM_SYNCHRONIZE=false` запрещает автоматическое изменение production-схемы.
