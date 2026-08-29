@@ -22,10 +22,12 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 1
 fi
 
-if ! grep -q '^BACKEND_PORT=' "${ENV_FILE}"; then
-  echo "BACKEND_PORT is missing from ${ENV_FILE}." >&2
-  exit 1
-fi
+for variable in BACKEND_PORT VITE_API_URL; do
+  if ! grep -q "^${variable}=" "${ENV_FILE}"; then
+    echo "${variable} is missing from ${ENV_FILE}." >&2
+    exit 1
+  fi
+done
 
 current_branch="$(git branch --show-current)"
 if [[ "${current_branch}" != "${EXPECTED_BRANCH}" ]]; then
@@ -43,33 +45,63 @@ echo "Updating ${EXPECTED_BRANCH} from origin..."
 git pull --ff-only origin "${EXPECTED_BRANCH}"
 
 commit_sha="$(git rev-parse --short=12 HEAD)"
-image="news-backend:${commit_sha}"
+backend_image="news-backend:${commit_sha}"
+frontend_image="news-frontend:${commit_sha}"
+vite_api_url="$(awk -F= '$1 == "VITE_API_URL" { print substr($0, index($0, "=") + 1); exit }' "${ENV_FILE}")"
+gateway_network="$(awk -F= '$1 == "GATEWAY_NETWORK" { print substr($0, index($0, "=") + 1); exit }' "${ENV_FILE}")"
+gateway_network="${gateway_network:-gateway}"
 
-echo "Building ${image}..."
-docker build --tag "${image}" ./backend
+echo "Building ${backend_image}..."
+docker build --tag "${backend_image}" ./backend
 
-previous_image="$(awk -F= '$1 == "NEWS_BACKEND_IMAGE" { print substr($0, index($0, "=") + 1); exit }' "${ENV_FILE}")"
+echo "Building ${frontend_image}..."
+docker build \
+  --build-arg VITE_BASE_PATH=/news/ \
+  --build-arg "VITE_API_URL=${vite_api_url}" \
+  --tag "${frontend_image}" \
+  ./frontend
+
+previous_backend_image="$(awk -F= '$1 == "NEWS_BACKEND_IMAGE" { print substr($0, index($0, "=") + 1); exit }' "${ENV_FILE}")"
+previous_frontend_image="$(awk -F= '$1 == "NEWS_FRONTEND_IMAGE" { print substr($0, index($0, "=") + 1); exit }' "${ENV_FILE}")"
 temporary_env="$(mktemp "${ENV_FILE}.tmp.XXXXXX")"
 trap 'rm -f "${temporary_env}"' EXIT
 
 umask 077
-awk -v image="${image}" '
-  BEGIN { updated = 0 }
+awk \
+  -v backend_image="${backend_image}" \
+  -v frontend_image="${frontend_image}" \
+  -v gateway_network="${gateway_network}" '
+  BEGIN { backend_updated = 0; frontend_updated = 0; network_updated = 0 }
   /^NEWS_BACKEND_IMAGE=/ {
-    print "NEWS_BACKEND_IMAGE=" image
-    updated = 1
+    print "NEWS_BACKEND_IMAGE=" backend_image
+    backend_updated = 1
+    next
+  }
+  /^NEWS_FRONTEND_IMAGE=/ {
+    print "NEWS_FRONTEND_IMAGE=" frontend_image
+    frontend_updated = 1
+    next
+  }
+  /^GATEWAY_NETWORK=/ {
+    print "GATEWAY_NETWORK=" gateway_network
+    network_updated = 1
     next
   }
   { print }
   END {
-    if (!updated) {
-      print "NEWS_BACKEND_IMAGE=" image
-    }
+    if (!backend_updated) print "NEWS_BACKEND_IMAGE=" backend_image
+    if (!frontend_updated) print "NEWS_FRONTEND_IMAGE=" frontend_image
+    if (!network_updated) print "GATEWAY_NETWORK=" gateway_network
   }
 ' "${ENV_FILE}" >"${temporary_env}"
 
 chmod 600 "${temporary_env}"
 mv "${temporary_env}" "${ENV_FILE}"
+
+if ! docker network inspect "${gateway_network}" >/dev/null 2>&1; then
+  echo "Creating shared proxy network ${gateway_network}..."
+  docker network create "${gateway_network}" >/dev/null
+fi
 
 echo "Validating production Compose configuration..."
 docker compose \
@@ -84,10 +116,19 @@ if ! docker compose \
   up -d --no-build --wait --wait-timeout 180; then
   echo "Deployment failed." >&2
 
-  if [[ -n "${previous_image}" && "${previous_image}" != "${image}" ]]; then
-    echo "Restoring previous image ${previous_image}..." >&2
-    sed -i.bak "s|^NEWS_BACKEND_IMAGE=.*|NEWS_BACKEND_IMAGE=${previous_image}|" "${ENV_FILE}"
+  if [[ -n "${previous_backend_image}" && "${previous_backend_image}" != "${backend_image}" ]]; then
+    echo "Restoring previous backend image ${previous_backend_image}..." >&2
+    sed -i.bak "s|^NEWS_BACKEND_IMAGE=.*|NEWS_BACKEND_IMAGE=${previous_backend_image}|" "${ENV_FILE}"
     rm -f "${ENV_FILE}.bak"
+  fi
+
+  if [[ -n "${previous_frontend_image}" && "${previous_frontend_image}" != "${frontend_image}" ]]; then
+    echo "Restoring previous frontend image ${previous_frontend_image}..." >&2
+    sed -i.bak "s|^NEWS_FRONTEND_IMAGE=.*|NEWS_FRONTEND_IMAGE=${previous_frontend_image}|" "${ENV_FILE}"
+    rm -f "${ENV_FILE}.bak"
+  fi
+
+  if [[ -n "${previous_backend_image}" || -n "${previous_frontend_image}" ]]; then
     docker compose \
       --env-file "${ENV_FILE}" \
       -f "${COMPOSE_FILE}" \
@@ -97,7 +138,7 @@ if ! docker compose \
   exit 1
 fi
 
-echo "Deployment completed: ${image}"
+echo "Deployment completed: ${backend_image}, ${frontend_image}"
 docker compose \
   --env-file "${ENV_FILE}" \
   -f "${COMPOSE_FILE}" \

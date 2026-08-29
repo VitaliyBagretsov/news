@@ -6,7 +6,7 @@ import { AppRouter } from './router';
 const App = () => {
   return (
     <ApiProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AuthRedirectProvider>
           <AppRouter />
         </AuthRedirectProvider>
