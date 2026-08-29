@@ -116,7 +116,7 @@ Bruno. Переменная обязательна; скрытого значе�
 Frontend Vite читает этот же корневой `.env` и отправляет запросы по адресу из
 `VITE_API_URL`. Для backend, запущенного напрямую, используйте
 `http://localhost:3001/api`; для контейнерного backend — порт `3000`.
-Production-шаблон использует будущий внешний префикс `/news/api`.
+Production-шаблон использует внешний префикс `/news/api`.
 
 ### Запуск только PostgreSQL
 
@@ -217,12 +217,13 @@ Keycloak и серверной таблице сессий, а не `news.user`.
 
 ## Подготовка production Compose
 
-`docker-compose.prod.yml` предназначен для запуска backend и PostgreSQL на ВМ.
-PostgreSQL не публикует порт на хост, backend доступен только на
-`127.0.0.1:${BACKEND_PORT}` и в дальнейшем должен быть подключён к общему
-Nginx. Production secrets находятся только в `.env.prod`, шаблон — в
-`.env.prod.example`. Compose запускает готовый образ из `NEWS_BACKEND_IMAGE`.
-В production-файле `.env.prod` также обязательно задаётся `BACKEND_PORT`.
+`docker-compose.prod.yml` предназначен для запуска PostgreSQL, backend и
+frontend на ВМ. PostgreSQL не публикует порт на хост, а frontend вообще не
+публикует отдельный порт ВМ. Backend оставляет локальный диагностический порт
+`127.0.0.1:${BACKEND_PORT}`. Для внешнего доступа backend и frontend входят в
+общую с reverse proxy сеть `GATEWAY_NETWORK`. Production secrets находятся
+только в `.env.prod`, шаблон — в `.env.prod.example`. Compose запускает готовые
+образы из `NEWS_BACKEND_IMAGE` и `NEWS_FRONTEND_IMAGE`.
 
 ```bash
 cp .env.prod.example .env.prod
@@ -251,10 +252,12 @@ cd /opt/news
 1. проверяет наличие `.env.prod`, ветку `main` и отсутствие изменений в
    отслеживаемых файлах;
 2. выполняет `git pull --ff-only origin main`;
-3. собирает backend на ВМ как `news-backend:<commit SHA>`;
-4. записывает этот тег в `NEWS_BACKEND_IMAGE`, не изменяя остальные секреты;
-5. проверяет Compose, обновляет сервисы и ждёт успешных healthcheck;
-6. при неудачном запуске возвращает предыдущий образ, если он был указан.
+3. собирает на ВМ `news-backend:<commit SHA>` и `news-frontend:<commit SHA>`;
+4. собирает frontend с базовым URL `/news/` и API URL из `VITE_API_URL`;
+5. записывает теги образов в `.env.prod`, не изменяя остальные секреты;
+6. создаёт при отсутствии общую Docker-сеть `GATEWAY_NETWORK`;
+7. проверяет Compose, обновляет сервисы и ждёт успешных healthcheck;
+8. при неудачном запуске возвращает предыдущие образы, если они были указаны.
 
 Скрипт не удаляет образы и build cache автоматически. Их следует очищать
 отдельно после проверки работающего релиза. PostgreSQL не пересоздаётся, если

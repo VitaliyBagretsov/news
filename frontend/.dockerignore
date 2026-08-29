@@ -1,6 +1,5 @@
 # Deps
 node_modules/
-package-lock.json
 
 # Docker
 Dockerfile
@@ -17,4 +16,4 @@ build/
 # IDE Files
 .idea/
 .vscode
-.DS_Store 
+.DS_Store
