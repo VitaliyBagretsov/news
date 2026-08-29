@@ -13,6 +13,8 @@ request:
       value: "{{process.env.NEWS_PASSWORD}}"
     - name: media_id
       value: "1"
+    - name: media_logo_file
+      value: ""
 
 bundled: false
 

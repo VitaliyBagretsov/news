@@ -14,6 +14,5 @@ export const normalizeMediaFormValues = (values: CreateMedia): CreateMedia => {
     address: optionalText(values.address),
     phone: optionalText(values.phone),
     email: optionalText(values.email),
-    logo: optionalText(values.logo),
   };
 };

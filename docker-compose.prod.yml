@@ -29,11 +29,14 @@ services:
     environment:
       NODE_ENV: production
       BACKEND_PORT: ${BACKEND_PORT:?BACKEND_PORT must be set}
+      MEDIA_IMAGES_DIR: /news/public/images
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       TYPEORM_SYNCHRONIZE: "false"
     ports:
       - "127.0.0.1:${BACKEND_PORT:?BACKEND_PORT must be set}:${BACKEND_PORT:?BACKEND_PORT must be set}"
+    volumes:
+      - news_media_images:/news/public/images
     networks:
       - news_network
       - gateway_network
@@ -74,6 +77,7 @@ services:
 
 volumes:
   news_postgres_data:
+  news_media_images:
 
 networks:
   news_network:

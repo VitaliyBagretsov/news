@@ -1,11 +1,11 @@
 info:
-  name: Delete media
+  name: Delete media logo
   type: http
-  seq: 8
+  seq: 7
 
 http:
   method: DELETE
-  url: "{{backend_url}}/media/{{media_id}}"
+  url: "{{backend_url}}/media/{{media_id}}/logo"
   auth: inherit
 
 settings:

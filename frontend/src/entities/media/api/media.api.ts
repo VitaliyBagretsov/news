@@ -23,4 +23,18 @@ export const mediaApi = {
 
     return response.data;
   },
+
+  updateLogo: async (id: number, file: File): Promise<Media> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post<Media>(`/media/${id}/logo`, formData);
+
+    return response.data;
+  },
+
+  removeLogo: async (id: number): Promise<Media> => {
+    const response = await apiClient.delete<Media>(`/media/${id}/logo`);
+
+    return response.data;
+  },
 };

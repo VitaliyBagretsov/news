@@ -15,7 +15,8 @@ const UpdateMediaFeature = ({ media }: UpdateMediaFeatureProps) => {
   const [form] = Form.useForm<CreateMedia>();
   const { data: session } = useAuthSessionQuery();
   const updateMedia = useUpdateMediaMutation();
-  const { id, ...initialValues } = media;
+  const { id } = media;
+  const initialValues: CreateMedia = media;
 
   if (!session?.user.roles.includes('admin')) return null;
 

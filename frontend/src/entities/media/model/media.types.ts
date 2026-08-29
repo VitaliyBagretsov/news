@@ -10,10 +10,10 @@ export interface Media {
   email?: string;
   phone?: string;
   isActive: boolean;
-  logo?: string;
+  logo?: string | null;
 }
 
-export type CreateMedia = Omit<Media, 'id'>;
+export type CreateMedia = Omit<Media, 'id' | 'logo'>;
 export type UpdateMedia = Partial<CreateMedia>;
 
 export interface MediaStatistics {

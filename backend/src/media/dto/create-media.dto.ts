@@ -43,8 +43,4 @@ export class CreateMediaDto {
 
   @IsBoolean()
   isActive: boolean;
-
-  @IsOptional()
-  @IsUrl()
-  logo?: string;
 }

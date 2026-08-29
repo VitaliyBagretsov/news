@@ -16,4 +16,9 @@ export default () => ({
     password: process.env.POSTGRES_PASSWORD,
     name: process.env.POSTGRES_DB,
   },
+  mediaImages: {
+    directory:
+      process.env.MEDIA_IMAGES_DIR ?? resolve(process.cwd(), 'public/images'),
+  },
 });
+import { resolve } from 'node:path';

@@ -80,15 +80,6 @@ export const MediaForm = ({ form, initialValues, onFinish }: MediaFormProps) => 
           <Input maxLength={5000} />
         </Form.Item>
       </Col>
-      <Col md={12} xs={24}>
-        <Form.Item
-          label="URL логотипа"
-          name="logo"
-          rules={[{ type: 'url', message: 'Введите корректный URL' }]}
-        >
-          <Input placeholder="https://example.com/logo.png" />
-        </Form.Item>
-      </Col>
     </Row>
 
     <Form.Item label="Использовать для сбора новостей" name="isActive" valuePropName="checked">

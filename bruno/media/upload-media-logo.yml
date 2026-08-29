@@ -1,0 +1,21 @@
+info:
+  name: Upload media logo
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{backend_url}}/media/{{media_id}}/logo"
+  body:
+    type: multipart-form
+    data:
+      - name: file
+        type: file
+        value: "{{media_logo_file}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

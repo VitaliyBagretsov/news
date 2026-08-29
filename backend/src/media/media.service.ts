@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { CreateMediaDto } from './dto/create-media.dto.js';
 import { UpdateMediaDto } from './dto/update-media.dto.js';
@@ -10,37 +10,46 @@ import type {
   MediaStatistics,
   MediaStatisticsRow,
 } from './media.types.js';
+import type { UploadedMediaImage } from './media-image.types.js';
+import { MediaImagesService } from './media-images.service.js';
 import { NotFoundException } from '#exceptions/not-found.exception';
+import { News } from '#news/entities';
 
 @Injectable()
 export class MediaService {
   constructor(
-    @InjectEntityManager()
-    private entityManager: EntityManager,
+    @InjectRepository(Media)
+    private readonly mediaRepository: Repository<Media>,
+    private readonly mediaImagesService: MediaImagesService,
   ) {}
 
   create(createMediaDto: CreateMediaDto): Promise<Media> {
-    return this.entityManager.save(Media, createMediaDto);
+    return this.mediaRepository.save(createMediaDto);
   }
 
-  findAll() {
-    return this.entityManager.find(Media);
+  findAll(): Promise<Media[]> {
+    return this.mediaRepository.find();
   }
 
-  async findStatistics(): Promise<MediaStatistics[]> {
-    const rows = await this.entityManager.query<MediaStatisticsRow[]>(`
-      SELECT
-        media.id AS "mediaId",
-        COUNT(news.id)::int AS "newsCount",
-        COUNT(news.id) FILTER (
+  async findStatistics(mediaIds: number[]): Promise<MediaStatistics[]> {
+    if (mediaIds.length === 0) return [];
+
+    const rows = await this.mediaRepository
+      .createQueryBuilder('media')
+      .leftJoin(News, 'news', 'news.mediaId = media.id')
+      .select('media.id', 'mediaId')
+      .addSelect('COUNT(news.id)::int', 'newsCount')
+      .addSelect(
+        `COUNT(news.id) FILTER (
           WHERE news.date >= NOW() - INTERVAL '24 hours'
-        )::int AS "publicationsLast24Hours",
-        MAX(news.date) AS "lastPublishedAt"
-      FROM news.media AS media
-      LEFT JOIN news.news AS news ON news."mediaId" = media.id
-      GROUP BY media.id
-      ORDER BY media.id
-    `);
+        )::int`,
+        'publicationsLast24Hours',
+      )
+      .addSelect('MAX(news.date)', 'lastPublishedAt')
+      .where('media.id IN (:...mediaIds)', { mediaIds })
+      .groupBy('media.id')
+      .orderBy('media.id')
+      .getRawMany<MediaStatisticsRow>();
 
     return rows.map((row) => ({
       mediaId: Number(row.mediaId),
@@ -53,7 +62,9 @@ export class MediaService {
   }
 
   async addStatistics(mediaList: Media[]): Promise<MediaListItem[]> {
-    const statistics = await this.findStatistics();
+    const statistics = await this.findStatistics(
+      mediaList.map((media) => media.id),
+    );
     const statisticsByMediaId = new Map(
       statistics.map((item) => [item.mediaId, item]),
     );
@@ -70,8 +81,8 @@ export class MediaService {
     });
   }
 
-  findOne(id: number) {
-    return this.entityManager.findOneBy(Media, { id }).then((res) => {
+  findOne(id: number): Promise<Media> {
+    return this.mediaRepository.findOneBy({ id }).then((res) => {
       if (!res) throw new NotFoundException(id);
       return res;
     });
@@ -80,12 +91,39 @@ export class MediaService {
   async update(id: number, updateMediaDto: UpdateMediaDto): Promise<Media> {
     const media = await this.findOne(id);
 
-    return this.entityManager.save(Media, Object.assign(media, updateMediaDto));
+    return this.mediaRepository.save(Object.assign(media, updateMediaDto));
   }
 
-  remove(id: number) {
-    return this.findOne(id).then((res) => {
-      return this.entityManager.remove(Media, [res]);
+  async remove(id: number): Promise<Media[]> {
+    const media = await this.findOne(id);
+    const removedMedia = await this.mediaRepository.remove([media]);
+    await this.mediaImagesService.remove(media.logo);
+    return removedMedia;
+  }
+
+  async updateLogo(id: number, file: UploadedMediaImage): Promise<Media> {
+    const media = await this.findOne(id);
+    const previousLogo = media.logo;
+    const logo = await this.mediaImagesService.save(id, file);
+
+    try {
+      const updatedMedia = await this.mediaRepository.save({ ...media, logo });
+      await this.mediaImagesService.remove(previousLogo);
+      return updatedMedia;
+    } catch (error) {
+      await this.mediaImagesService.remove(logo);
+      throw error;
+    }
+  }
+
+  async removeLogo(id: number): Promise<Media> {
+    const media = await this.findOne(id);
+    const previousLogo = media.logo;
+    const updatedMedia = await this.mediaRepository.save({
+      ...media,
+      logo: null,
     });
+    await this.mediaImagesService.remove(previousLogo);
+    return updatedMedia;
   }
 }
